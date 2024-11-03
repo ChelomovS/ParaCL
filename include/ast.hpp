@@ -2,6 +2,7 @@
 #define TREE_HPP_
 
 #include <string>
+#include <vector>
 
 namespace Ast {
 
@@ -14,6 +15,7 @@ enum class TreeNodeType {
     kPrintNode        = 5,
     kBinOpNode        = 6,
     kQuestionMarkNode = 7,
+    kScopeNode        = 8,
 };
 
 class TreeNode {
@@ -26,7 +28,7 @@ class TreeNode {
     virtual ~TreeNode() = 0;
 };
 
-class Tree final {
+class Ast {
     TreeNode* root;
 };
 
@@ -61,7 +63,7 @@ class DeclNode : public TreeNode {
   private:
     std::string variable_name_;
   public:
-    DeclNode(TreeNode* parent, std::string variable_name) 
+    DeclNode(TreeNode* parent, const std::string& variable_name) 
         : TreeNode{parent, TreeNodeType::kDeclNode}, variable_name_(variable_name) {}
     ~DeclNode() {};
 };
@@ -117,6 +119,19 @@ class QuestionMarkNode : public TreeNode {
     QuestionMarkNode(TreeNode* parent)
         : TreeNode{parent, TreeNodeType::kQuestionMarkNode} {}
     ~QuestionMarkNode() {}
+};
+
+class ScopeNode : public TreeNode {
+  private:
+    std::vector<TreeNode*> scope_statements_; // NOTE ?
+  public:
+    ScopeNode(TreeNode* parent, const std::vector<TreeNode*>& scope_statements)
+        : TreeNode{parent, TreeNodeType::kScopeNode}, scope_statements_(scope_statements) {}
+    ~ScopeNode() {
+        for (auto it_statements: scope_statements_) {
+            it_statements->~TreeNode();
+        }
+    }
 };
 
 } // namespace Ast
