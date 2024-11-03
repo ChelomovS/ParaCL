@@ -21,7 +21,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wpedantic -g -O0 -DDEBUG \
                           -fsanitize=address -fsanitize=undefined")
 
 set_target_properties(
-    matrix PROPERTIES
+    ParaCL PROPERTIES
     CXX_STANDARD          20
     CXX_STANDARD_REQUIRED ON
 )
