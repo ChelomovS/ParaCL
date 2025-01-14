@@ -26,6 +26,11 @@ set_target_properties(
     CXX_STANDARD_REQUIRED ON
 )
 
+# to output colors
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
+endif()
+
 add_subdirectory(tests)
 
 target_link_libraries(ParaCL ${GTEST_BOTH_LIBRARIES})
