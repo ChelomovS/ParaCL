@@ -1,31 +1,32 @@
-cmake_minimum_required(VERSION 3.17)
-project(ParaCL)
+cmake_minimum_required(VERSION 3.13)
+project(paracl)
 
-set(CMAKE_CXX_STANDARD          20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(BISON REQUIRED)
+find_package(FLEX REQUIRED)
 
-find_package(GTest REQUIRED)
-enable_testing()
+set(GRAMMAR "parser.y" CACHE STRING "file with grammar" FORCE)
 
-set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+flex_target(scanner
+  lexer.l
+  ${CMAKE_CURRENT_BINARY_DIR}/lexer.cpp
+) # Cоздание лексера lexer.cpp через lexer.l 
 
-aux_source_directory(source SRC_FILES)
+bison_target(parser
+  ${GRAMMAR}
+  ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
+  COMPILE_FLAGS "--defines=${CMAKE_CURRENT_BINARY_DIR}/grammar.tab.hpp"
+) # Cоздание parser.cpp в той же директории через GRAMMAR + создание заголовочного файла grammar.tab.hpp
 
-add_executable(ParaCL ${SRC_FILES})
+add_flex_bison_dependency(scanner parser) 
 
-target_include_directories(ParaCL PRIVATE ${INCLUDE_DIR} ${GTEST_INCLUDE_DIRS})
+add_executable(${PROJECT_NAME} 
+  source/driver.cpp
+  ${BISON_parser_OUTPUTS}
+  ${FLEX_scanner_OUTPUTS}
+) # BISON_parser_OUTPUTS - parser.cpp, FLEX_scanner_OUTPUT - lexer.cpp
 
-set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wpedantic -g -O0 -DDEBUG \
-                          -Wmissing-declarations -Wcast-align      \
-                          -Wunused -Wshadow -Wsign-conversion      \
-                          -fsanitize=address -fsanitize=undefined")
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE include)
 
-set_target_properties(
-    ParaCL PROPERTIES
-    CXX_STANDARD          20
-    CXX_STANDARD_REQUIRED ON
-)
-
-add_subdirectory(tests)
-
-target_link_libraries(ParaCL ${GTEST_BOTH_LIBRARIES})
