@@ -6,6 +6,7 @@
 #include <string_view>
 #include <unordered_map>
 #include <stdexcept>
+#include <cassert>
 
 class EntityTable {
   private:
