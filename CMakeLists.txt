@@ -33,7 +33,6 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
 
-find_path(FLEX_INCLUDE_DIR FlexLexer.h PATHS /usr/include /usr/local/include)
 include_directories(${FLEX_INCLUDE_DIR})
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)

@@ -17,7 +17,10 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install dependencies
-      run: sudo apt-get install -y cmake g++ bison flex
+      run: | 
+        sudo apt-get install -y cmake g++ bison flex
+        sudo apt-get install flex-dev
+      
 
     - name: Build with CMake
       run: |
