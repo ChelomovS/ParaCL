@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(paracl)
+project(ParaCL)
 
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
@@ -25,16 +25,15 @@ add_executable(${PROJECT_NAME}
   ${FLEX_scanner_OUTPUTS}
 ) # BISON_parser_OUTPUTS - parser.cpp, FLEX_scanner_OUTPUT - lexer.cpp
 
-set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wpedantic -g -O0 -DDEBUG \
-                          -Wmissing-declarations -Wcast-align      \
-                          -Wunused -Wshadow -Wsign-conversion      \
-                          -fsanitize=address -fsanitize=undefined")
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 set_target_properties(
-    ParaCL PROPERTIES
+    ${PROJECT_NAME}       PROPERTIES
     CXX_STANDARD          20
     CXX_STANDARD_REQUIRED ON
 )
 
 add_subdirectory(tests)
-
