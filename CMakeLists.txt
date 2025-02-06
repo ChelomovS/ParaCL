@@ -19,10 +19,13 @@ bison_target(parser
 
 add_flex_bison_dependency(scanner parser) 
 
+set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+
 add_executable(${PROJECT_NAME} 
   source/driver.cpp
   ${BISON_parser_OUTPUTS}
   ${FLEX_scanner_OUTPUTS}
+
 ) # BISON_parser_OUTPUTS - parser.cpp, FLEX_scanner_OUTPUT - lexer.cpp
 
 # to output colors
@@ -30,6 +33,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always") # For all targets
 endif()
 
+target_include_directories(ParaCL PRIVATE ${INCLUDE_DIR})
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
