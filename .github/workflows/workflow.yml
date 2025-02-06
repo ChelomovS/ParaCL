@@ -1,4 +1,5 @@
-name: ParaCL
+name: Build ParaCL
+
 on:
   push:
     branches:
@@ -10,21 +11,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
     - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y cmake g++ flex
+      run: sudo apt-get install -y cmake g++ bison flex
 
-    - name: cmake Build Release
+    - name: Build with CMake
       run: |
-        cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
-        cmake --build build/release
-
-    - name: cmake Build Debug
-      run: |
-        cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug
-        cmake --build build/debug
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
