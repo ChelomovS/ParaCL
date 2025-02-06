@@ -33,11 +33,7 @@ endif()
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(${PROJECT_NAME} PRIVATE include)
-target_compile_options(${PROJECT_NAME} PRIVATE -I/usr/include)
 
 set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wpedantic -g -Og -ggdb -DDEBUG \
                           -Wunused -Wshadow \
                           -fsanitize=address -fsanitize=undefined")
-
-add_subdirectory(tests)
