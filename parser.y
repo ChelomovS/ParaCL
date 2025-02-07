@@ -35,7 +35,7 @@ parser::token_type yylex(parser::semantic_type* yylval, Driver* driver);
     MINUS               "-"
     DIV                 "/"
     MUL                 "*"
-    ASSINGMENT          "="
+    ASSIGNMENT          "="
     INPUT               "?"
     NOT_EQUAL           "!="
     EQUAL               "=="
@@ -91,14 +91,12 @@ scope: begin_of_scope stmts end_of_scope
         { $$ = $3; }
 
 begin_of_scope: LEFT_CURLY_BRACKER  
-        { driver->current_scope_ = driver->tree.insert_scope_node(driver->current_scope_); 
-          driver->entity_table_.push_scope(); }
+        { driver->current_scope_ = driver->tree.insert_scope_node(driver->current_scope_); }
 ;
 
 end_of_scope: RIGHT_CURLY_BRACKER
         { $$ = driver->current_scope_; 
-          driver->current_scope_ = driver->current_scope_->close_scope();
-          driver->entity_table_.pop_scope(); }
+          driver->current_scope_ = driver->current_scope_->close_scope();}
 ;
 
 stmt: print SEMICOLON
@@ -189,5 +187,5 @@ parser::token_type yylex(parser::semantic_type* yylval,
   return driver->yylex(yylval);
 }
 
-void parser::error(const std::string&) { std::cerr << "ОШИБКА" << std::endl; }
+void parser::error(const std::string&) { std::cerr << "Error" << std::endl; }
 }

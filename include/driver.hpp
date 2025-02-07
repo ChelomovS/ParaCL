@@ -13,46 +13,46 @@
 namespace yy {
 
 class Driver {
-  FlexLexer *plex_;
+  private:
+    FlexLexer *plex_;
 
-public:
-  AST::Ast tree;
-  EntityTable entity_table_;
-  AST::ScopeNode* current_scope_;
-  // maybe тут calculator
-  Driver(FlexLexer *plex) : plex_{plex}, current_scope_{tree.insert_scope_node(nullptr)} {tree.root_ = current_scope_;};
- 
-  parser::token_type yylex(parser::semantic_type *yylval) {
-    parser::token_type tt = static_cast<parser::token_type>(plex_->yylex());
+  public:
+    AST::Ast tree;
+    AST::ScopeNode* current_scope_;
+    // maybe тут calculator
+    Driver(FlexLexer *plex) : plex_{plex}, current_scope_{tree.insert_scope_node(nullptr)} {tree.root_ = current_scope_;};
+    
+    parser::token_type yylex(parser::semantic_type *yylval) {
+        parser::token_type tt = static_cast<parser::token_type>(plex_->yylex());
 
-    switch (tt) {
-      case parser::token_type::NUMBER:
-        yylval->as<int>() = std::stoi(plex_->YYText());
-        break;
-      case parser::token_type::VAR: {
-        std::string name_of_variable = plex_->YYText();
-        yylval->emplace<std::string>(name_of_variable);
-        break;
-      }
-      default:
-        break;
+        switch (tt) {
+            case parser::token_type::NUMBER:
+                yylval->as<int>() = std::stoi(plex_->YYText());
+                break;
+            case parser::token_type::VAR: {
+                std::string name_of_variable = plex_->YYText();
+                yylval->emplace<std::string>(name_of_variable);
+                break;
+            }
+            default:
+                break;
+        }
+
+        return tt; 
     }
-
-    return tt; 
-  }
-
-  bool parse() {
-    parser parser(this);
-    bool res = parser.parse();
-    return !res;
-  }
-
-  void add_node(AST::TreeNode* new_node) {
-    current_scope_->add_node(new_node);
-  }
-
-};
-
+      
+    bool parse() {
+        parser parser(this);
+        bool res = parser.parse();
+        return !res;
+    }
+    
+    void add_node(AST::TreeNode* new_node) {
+        current_scope_->add_node(new_node);
+    }
+      
+};    
+    
 } // namespace yy
-
+      
 #endif // DRIVER_HPP
