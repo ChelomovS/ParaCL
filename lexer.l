@@ -35,6 +35,6 @@ VAR            [a-zA-Z_][a-zA-Z_0-9]*
 "while"               return yy::parser::token_type::WHILE;
 "print"               return yy::parser::token_type::PRINT;
 {VAR}                 return yy::parser::token_type::VAR; 
-.                     { std::cerr << "ошибка лексера: " << yytext << std::endl; return yy::parser::token_type::ERROR; }
+.                     { std::cerr << "lexer error: " << yytext << std::endl; return yy::parser::token_type::ERROR; }
 
 %%
