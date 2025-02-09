@@ -19,8 +19,8 @@ int main(const int argc, const char* argv[]) {
 #if defined (NDEBUG)
     spdlog::set_level(spdlog::level::info);
 #else // NDEBUG
-    // spdlog::flush_on(spdlog::level::trace);
-    spdlog::set_level(spdlog::level::debug);
+    spdlog::flush_on(spdlog::level::trace);
+    spdlog::set_level(spdlog::level::trace);
 #endif // NDEBUG
 
     // log argv
@@ -50,6 +50,8 @@ int main(const int argc, const char* argv[]) {
     yy::Driver driver(lexer);
     driver.parse();
 
+    spdlog::info("parse completed");
+
     std::ofstream dump_file{}; // FIXME 
     driver.tree.print(dump_file);
 
@@ -58,6 +60,8 @@ int main(const int argc, const char* argv[]) {
     
     intpr::Interpreter interpreter(ast);
     interpreter.visit_all();
+
+    spdlog::info("interpreter completed");
     
     return 0;
 }

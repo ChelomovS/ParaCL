@@ -50,7 +50,10 @@ class Driver {
     void add_node(ast::TreeNode* new_node) {
         current_scope_->add_node(new_node);
     }
-      
+    
+    void reverse() {
+        current_scope_->reverse();
+    }
 };    
     
 } // namespace yy

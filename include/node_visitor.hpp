@@ -1,6 +1,8 @@
 #ifndef NODE_VISITOR_HPP
 #define NODE_VISITOR_HPP
 
+// should not include ast.hpp
+
 namespace ast {
 
 // forward decl
@@ -8,6 +10,7 @@ class WhileNode;
 class IfNode;
 class ElseNode;
 class DeclNode;
+class VarDerefNode;
 class AssignmentNode;
 class ValueNode;
 class PrintNode;
@@ -26,6 +29,7 @@ class NodeVisitor {
     virtual void visit(const IfNode& node) = 0;
     virtual void visit(const ElseNode& node) = 0;
     virtual void visit(const DeclNode& node) = 0;
+    virtual void visit(const VarDerefNode& node) = 0;
     virtual void visit(const AssignmentNode& node) = 0;
     virtual void visit(const ValueNode& node) = 0;
     virtual void visit(const PrintNode& node) = 0;

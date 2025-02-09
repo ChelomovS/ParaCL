@@ -3,8 +3,9 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
+#include <deque>
 #include <fstream> 
+#include <algorithm>
 
 #include "node_visitor.hpp"
 
@@ -15,19 +16,21 @@ enum class TreeNodeType {
     kIfNode           = 1,
     kElseNode         = 2,
     kDeclNode         = 3,
-    kAssignmentNode   = 4,
-    kValueNode        = 5,
-    kPrintNode        = 6,
-    kBinOpNode        = 7,
-    kQuestionMarkNode = 8,
-    kScopeNode        = 9,
-    kExprNode         = 10,
+    kVarDerefNode     = 4,
+    kAssignmentNode   = 5,
+    kValueNode        = 6,
+    kPrintNode        = 7,
+    kBinOpNode        = 8,
+    kQuestionMarkNode = 9,
+    kScopeNode        = 10,
+    kExprNode         = 11,
 };
 
 class WhileNode;
 class IfNode;
 class ElseNode;
 class DeclNode;
+class VarDerefNode;
 class AssignmentNode;
 class ValueNode;
 class PrintNode;
@@ -105,6 +108,20 @@ class DeclNode final : public TreeNode {
     DeclNode(const std::string& variable_name) 
         : TreeNode{TreeNodeType::kDeclNode}, variable_name_{variable_name} {}
     ~DeclNode() {};
+
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
+
+    std::string get_name() const { return variable_name_; }
+};
+
+class VarDerefNode final : public TreeNode {
+  private:
+    std::string variable_name_;
+  public:
+    VarDerefNode(const std::string& variable_name)
+        : TreeNode{TreeNodeType::kVarDerefNode}, variable_name_{variable_name} {}
+    ~VarDerefNode() {};
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
     void print(std::ofstream& file) const override;
@@ -211,22 +228,24 @@ class LogOpNode final : public TreeNode {
 
 class QuestionMarkNode final : public TreeNode {
   private:
-    TreeNode* decl_node_;
+    // TreeNode* decl_node_;
   public:
-    QuestionMarkNode(TreeNode* decl_node = nullptr)
-        : TreeNode{TreeNodeType::kQuestionMarkNode}, decl_node_{decl_node} {}
+    // QuestionMarkNode(TreeNode* decl_node = nullptr)
+    QuestionMarkNode()
+        // : TreeNode{TreeNodeType::kQuestionMarkNode}, decl_node_{decl_node} {}
+        : TreeNode{TreeNodeType::kQuestionMarkNode} {}
     ~QuestionMarkNode() {}
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
     void print(std::ofstream& file) const override;
 
-    const TreeNode* get_decl() const { return decl_node_; }
+    // const TreeNode* get_decl() const { return decl_node_; }
 };
 
 class ScopeNode final : public TreeNode {
   private:
     ScopeNode* parent_node_;
-    std::vector<TreeNode*> nodes_;
+    std::deque<TreeNode*> nodes_;
 
   public:
     ScopeNode(ScopeNode* parent_node)
@@ -237,10 +256,14 @@ class ScopeNode final : public TreeNode {
     void print(std::ofstream& file) const override;
 
     const TreeNode* get_parent_scope() const { return parent_node_; } // NOTE ?????
-    const std::vector<TreeNode*>* get_nodes() const { return &nodes_; } // REVIEW
+    const std::deque<TreeNode*>* get_nodes() const { return &nodes_; } // REVIEW
 
     void add_node(TreeNode* new_node) {
-        nodes_.push_back(new_node);
+        nodes_.push_front(new_node);
+    }
+
+    void reverse() {
+        std::reverse(nodes_.begin(), nodes_.end());
     }
 
     ScopeNode* close_scope() {
@@ -262,6 +285,7 @@ class ExprNode final : public TreeNode {
     const TreeNode* get_expr() const { return expr_node_; }
 };
 
+// FIXME add destructor
 class Ast final {
   public:
     TreeNode* root_= nullptr;
@@ -296,6 +320,12 @@ class Ast final {
         DeclNode* new_decl_node = new DeclNode{variable_name};
         nodes_.push_back(new_decl_node);
         return static_cast<DeclNode*>(nodes_.back());
+    }   
+
+    VarDerefNode* insert_var_deref_node(const std::string& variable_name) {
+        VarDerefNode* new_var_deref_node = new VarDerefNode{variable_name};
+        nodes_.push_back(new_var_deref_node);
+        return static_cast<VarDerefNode*>(nodes_.back());
     }
 
     AssignmentNode* insert_assignment_node(TreeNode* decl_node = nullptr, TreeNode* expr_node = nullptr) {
@@ -328,8 +358,10 @@ class Ast final {
         return static_cast<LogOpNode*>(nodes_.back());
     }
 
-    QuestionMarkNode* insert_question_mark_node(TreeNode* decl_node = nullptr) {
-        QuestionMarkNode* new_question_mark_node = new QuestionMarkNode(decl_node);
+    // QuestionMarkNode* insert_question_mark_node(TreeNode* decl_node = nullptr) {
+    QuestionMarkNode* insert_question_mark_node() {
+        // QuestionMarkNode* new_question_mark_node = new QuestionMarkNode(decl_node);
+        QuestionMarkNode* new_question_mark_node = new QuestionMarkNode();
         nodes_.push_back(new_question_mark_node);
         return static_cast<QuestionMarkNode*>(nodes_.back());
     }
