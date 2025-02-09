@@ -12,6 +12,7 @@ VAR            [a-zA-Z_][a-zA-Z_0-9]*
 %%
 
 {WS}                  /* skip blanks and tabs */
+"//".*
 {NUMBER}              return yy::parser::token_type::NUMBER;
 ")"                   return yy::parser::token_type::RIGHT_ROUND_BRACKER; 
 "("                   return yy::parser::token_type::LEFT_ROUND_BRACKER; 
