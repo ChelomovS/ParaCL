@@ -23,6 +23,7 @@ class Interpreter final : public ast::NodeVisitor {
     void visit(const ast::IfNode& node) override;
     void visit(const ast::ElseNode& node) override;
     void visit(const ast::DeclNode& node) override;
+    void visit(const ast::VarDerefNode& node) override;
     void visit(const ast::AssignmentNode& node) override;
     void visit(const ast::ValueNode& node) override;
     void visit(const ast::PrintNode& node) override;

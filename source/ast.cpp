@@ -48,6 +48,11 @@ void DeclNode::print(std::ofstream& file) const {
     file << "\t\"" << this << "\" [label = \"Decl node (name of variable: " << variable_name_ << ")\", shape = \"octagon\", style = \"filled\", fillcolor = \"#95c9bc\"]";
 }
 
+void VarDerefNode::print(std::ofstream& file) const {
+    file << "\t\"" << this << "\" [label = \"VarDeref node (name of variable: " << variable_name_ << ")\", shape = \"octagon\", style = \"filled\", fillcolor = \"#95c9bc\"]";
+}
+
+
 void AssignmentNode::print(std::ofstream& file) const {
     file << "\t\"" << this << "\" [label = \"Assignment node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
 
@@ -138,10 +143,10 @@ void LogOpNode::print(std::ofstream& file) const {
 void QuestionMarkNode::print(std::ofstream& file) const {
     file << "\t\"" << this << "\" [label = \"? node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
 
-    if (decl_node_) {
-        file << "\t\"" << this << "\" -> \"" << decl_node_ << "\"" << std::endl;
-        decl_node_->print(file);
-    }
+    // if (decl_node_) {
+    //     file << "\t\"" << this << "\" -> \"" << decl_node_ << "\"" << std::endl;
+    //     decl_node_->print(file);
+    // }
 } 
 
 void ScopeNode::print(std::ofstream& file) const {
