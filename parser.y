@@ -2,13 +2,19 @@
 
 %skeleton "lalr1.cc"
 %defines
+
 %define api.value.type variant 
+%define parse.error verbose
+
 %param {yy::Driver* driver}
+
+%locations
 
 %code requires 
 {
 #include <iostream>
 #include <string>
+
 #include "ast.hpp"
 
 namespace yy { class Driver; }
@@ -20,9 +26,11 @@ namespace yy { class Driver; }
 
 namespace yy {
 
-parser::token_type yylex(parser::semantic_type* yylval, Driver* driver);
+parser::token_type yylex(parser::semantic_type* yylval, 
+                         parser::location_type* loc_type, 
+                         Driver* driver);
 
-}
+} // namespace yy
 
 }
 
@@ -80,7 +88,6 @@ parser::token_type yylex(parser::semantic_type* yylval, Driver* driver);
 %nterm <ast::TreeNode*>        assignment
 %nterm <ast::TreeNode*>        value
 %nterm <ast::TreeNode*>        print
-/*%nterm <ast::TreeNode*>        input*/
 %nterm <ast::TreeNode*>        stmt
 %nterm <ast::TreeNode*>        stmts
 %nterm <ast::TreeNode*>        scope
@@ -154,12 +161,6 @@ stmt: print SEMICOLON
             parse_trace("Reducing: stmt -> comp_expr SEMICOLON"); 
             $$ = $1; 
         }
-    /*| input SEMICOLON 
-        { 
-            parse_trace("Reducing: stmt -> input SEMICOLON"); 
-            $$ = $1; 
-        }*/
-    
     | scope 
         { 
             parse_trace("Reducing: stmt -> scope"); 
@@ -200,14 +201,6 @@ else: ELSE stmt
             $$ = nullptr; 
         }
 ;
-/*
-input: decl ASSIGNMENT INPUT 
-        { 
-            parse_trace("Reducing: input -> decl ASSIGNMENT INPUT"); 
-            $$ = driver->tree.insert_question_mark_node($1); 
-        }
-;
-*/
 
 while: WHILE LEFT_ROUND_BRACKER comp_expr RIGHT_ROUND_BRACKER stmt
         { 
@@ -320,11 +313,16 @@ var_deref: VAR
 
 namespace yy {
 
-parser::token_type yylex(parser::semantic_type* yylval,                         
+parser::token_type yylex(parser::semantic_type* yylval,
+                         location* yyloc,
                          Driver* driver)
 {
-  return driver->yylex(yylval);
+    return driver->yylex(yylval, yyloc);
 }
 
-void parser::error(const std::string&) { std::cerr << "Error" << std::endl; }
+void parser::error(const location& loc, const std::string& error) {
+    std::cerr << "Error: " << error << std::endl;
+    std::cerr << "\tLine: " << loc.begin.line << std::endl;
 }
+
+} // namespace yy

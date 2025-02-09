@@ -2,10 +2,8 @@
 #define AST_HPP
 
 #include <string>
-#include <vector>
 #include <deque>
 #include <fstream> 
-#include <algorithm>
 
 #include "node_visitor.hpp"
 
@@ -228,18 +226,14 @@ class LogOpNode final : public TreeNode {
 
 class QuestionMarkNode final : public TreeNode {
   private:
-    // TreeNode* decl_node_;
+
   public:
-    // QuestionMarkNode(TreeNode* decl_node = nullptr)
     QuestionMarkNode()
-        // : TreeNode{TreeNodeType::kQuestionMarkNode}, decl_node_{decl_node} {}
         : TreeNode{TreeNodeType::kQuestionMarkNode} {}
     ~QuestionMarkNode() {}
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
     void print(std::ofstream& file) const override;
-
-    // const TreeNode* get_decl() const { return decl_node_; }
 };
 
 class ScopeNode final : public TreeNode {
@@ -262,10 +256,6 @@ class ScopeNode final : public TreeNode {
         nodes_.push_front(new_node);
     }
 
-    void reverse() {
-        std::reverse(nodes_.begin(), nodes_.end());
-    }
-
     ScopeNode* close_scope() {
         return parent_node_;
     }
@@ -285,7 +275,7 @@ class ExprNode final : public TreeNode {
     const TreeNode* get_expr() const { return expr_node_; }
 };
 
-// FIXME add destructor
+// NOTE add destructor
 class Ast final {
   public:
     TreeNode* root_= nullptr;
@@ -358,9 +348,7 @@ class Ast final {
         return static_cast<LogOpNode*>(nodes_.back());
     }
 
-    // QuestionMarkNode* insert_question_mark_node(TreeNode* decl_node = nullptr) {
     QuestionMarkNode* insert_question_mark_node() {
-        // QuestionMarkNode* new_question_mark_node = new QuestionMarkNode(decl_node);
         QuestionMarkNode* new_question_mark_node = new QuestionMarkNode();
         nodes_.push_back(new_question_mark_node);
         return static_cast<QuestionMarkNode*>(nodes_.back());
@@ -378,7 +366,6 @@ class Ast final {
         return static_cast<ExprNode*>(nodes_.back());
     }
 };
-
 
 } // namespace AST
 

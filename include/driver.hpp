@@ -1,14 +1,10 @@
 #ifndef DRIVER_HPP
 #define DRIVER_HPP
 
+#include <FlexLexer.h>
+
 #include "grammar.tab.hpp"
 #include "ast.hpp"
-
-#include <FlexLexer.h>
-#include <iostream>
-#include <string_view>
-
-#include "entity_table.hpp"
 
 namespace yy {
 
@@ -19,11 +15,13 @@ class Driver {
   public:
     ast::Ast tree;
     ast::ScopeNode* current_scope_;
-    // maybe тут calculator
-    Driver(FlexLexer *plex) : plex_{plex}, current_scope_{tree.insert_scope_node(nullptr)} {tree.root_ = current_scope_;};
+
+    Driver(FlexLexer* plex) : plex_{plex}, current_scope_{tree.insert_scope_node(nullptr)} {tree.root_ = current_scope_;};
     
-    parser::token_type yylex(parser::semantic_type *yylval) {
+    parser::token_type yylex(parser::semantic_type* yylval, location* yyloc) {
         parser::token_type tt = static_cast<parser::token_type>(plex_->yylex());
+        
+        yyloc->initialize(nullptr, plex_->lineno(), 0);
 
         switch (tt) {
             case parser::token_type::NUMBER:
@@ -41,6 +39,7 @@ class Driver {
         return tt; 
     }
       
+    // returns true iff parsing succeededs
     bool parse() {
         parser parser(this);
         bool res = parser.parse();
@@ -51,11 +50,8 @@ class Driver {
         current_scope_->add_node(new_node);
     }
     
-    void reverse() {
-        current_scope_->reverse();
-    }
-};    
-    
+};
+
 } // namespace yy
       
 #endif // DRIVER_HPP
