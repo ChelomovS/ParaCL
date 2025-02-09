@@ -2,8 +2,9 @@
 #include <fstream>
 #include <iostream>
 
+#include "ast.hpp"
 #include "driver.hpp"
-#include "calculator.hpp"
+#include "interpreter.hpp"
 
 int yyFlexLexer::yywrap() { return 1; }
     
@@ -29,5 +30,11 @@ int main(const int argc, const char* argv[]) {
     std::ofstream dump_file{}; // FIXME 
     driver.tree.print(dump_file);
 
+    ast::Ast ast = driver.tree;
     delete lexer;
+    
+    intpr::Interpreter interpreter(ast);
+    interpreter.visit_all();
+    
+    return 0;
 }

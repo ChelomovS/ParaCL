@@ -60,21 +60,22 @@ parser::token_type yylex(parser::semantic_type* yylval, Driver* driver);
 %token <int>                   NUMBER
 %token <std::string>           VAR 
 
-%nterm <AST::TreeNode*>        program
-%nterm <AST::TreeNode*>        while
-%nterm <AST::TreeNode*>        if
-%nterm <AST::TreeNode*>        else
-%nterm <AST::TreeNode*>        expr 
-%nterm <AST::TreeNode*>        decl 
-%nterm <AST::TreeNode*>        assignment
-%nterm <AST::TreeNode*>        value
-%nterm <AST::TreeNode*>        print
-%nterm <AST::TreeNode*>        input
-%nterm <AST::TreeNode*>        stmt
-%nterm <AST::TreeNode*>        stmts
-%nterm <AST::TreeNode*>        scope
-%nterm <AST::TreeNode*>        begin_of_scope
-%nterm <AST::TreeNode*>        end_of_scope
+%nterm <ast::TreeNode*>        program
+%nterm <ast::TreeNode*>        while
+%nterm <ast::TreeNode*>        if
+%nterm <ast::TreeNode*>        else
+%nterm <ast::TreeNode*>        expr 
+%nterm <ast::TreeNode*>        comp_expr
+%nterm <ast::TreeNode*>        decl 
+%nterm <ast::TreeNode*>        assignment
+%nterm <ast::TreeNode*>        value
+%nterm <ast::TreeNode*>        print
+%nterm <ast::TreeNode*>        input
+%nterm <ast::TreeNode*>        stmt
+%nterm <ast::TreeNode*>        stmts
+%nterm <ast::TreeNode*>        scope
+%nterm <ast::TreeNode*>        begin_of_scope
+%nterm <ast::TreeNode*>        end_of_scope
 
 %% 
 
@@ -107,7 +108,7 @@ stmt: print SEMICOLON
         { $$ = $1; }
     | assignment SEMICOLON
         { $$ = $1; }
-    | expr SEMICOLON
+    | comp_expr SEMICOLON
         { $$ = $1; }
     | input SEMICOLON 
         { $$ = $1; }
@@ -116,15 +117,15 @@ stmt: print SEMICOLON
 ;
 
 
-assignment: decl ASSIGNMENT expr 
+assignment: decl ASSIGNMENT comp_expr 
         { $$ = driver->tree.insert_assignment_node($1, $3); }
 ;
 
-print: PRINT LEFT_ROUND_BRACKER expr RIGHT_ROUND_BRACKER 
+print: PRINT LEFT_ROUND_BRACKER comp_expr RIGHT_ROUND_BRACKER 
         { $$ = driver->tree.insert_print_node($3); }
 ;
 
-if: IF LEFT_ROUND_BRACKER expr RIGHT_ROUND_BRACKER stmt else
+if: IF LEFT_ROUND_BRACKER comp_expr RIGHT_ROUND_BRACKER stmt else
        { $$ = driver->tree.insert_if_node($3, $5, $6); }
 ;
 
@@ -137,32 +138,36 @@ else: ELSE stmt
 input: decl ASSIGNMENT INPUT 
         { $$ = driver->tree.insert_question_mark_node($1); };
 
-while: WHILE LEFT_ROUND_BRACKER expr RIGHT_ROUND_BRACKER stmt 
+while: WHILE LEFT_ROUND_BRACKER comp_expr RIGHT_ROUND_BRACKER stmt 
         { $$ = driver->tree.insert_while_node($3, $5); }
 ;
 
+comp_expr: expr 
+        { $$= driver->tree.insert_expr_node($1); }
+; 
+
 expr: expr PLUS expr 
-        { $$ = driver->tree.insert_bin_op_node(AST::BinaryOpType::kAdd, $1, $3);}
+        { $$ = driver->tree.insert_bin_op_node(ast::BinaryOpType::kAdd, $1, $3);}
     | expr MINUS expr 
-        { $$ = driver->tree.insert_bin_op_node(AST::BinaryOpType::kSub, $1, $3);}
+        { $$ = driver->tree.insert_bin_op_node(ast::BinaryOpType::kSub, $1, $3);}
     | expr MUL expr 
-        { $$ = driver->tree.insert_bin_op_node(AST::BinaryOpType::kMul, $1, $3); }
+        { $$ = driver->tree.insert_bin_op_node(ast::BinaryOpType::kMul, $1, $3); }
     | expr DIV expr 
-        { $$ = driver->tree.insert_bin_op_node(AST::BinaryOpType::kDiv, $1, $3); }
+        { $$ = driver->tree.insert_bin_op_node(ast::BinaryOpType::kDiv, $1, $3); }
     | LEFT_ROUND_BRACKER expr RIGHT_ROUND_BRACKER 
         { $$ = $2; }
     | expr EQUAL expr 
-        { $$ = driver->tree.insert_log_op_node(AST::LogicalOpType::kEqual, $1, $3); }
+        { $$ = driver->tree.insert_log_op_node(ast::LogicalOpType::kEqual, $1, $3); }
     | expr NOT_EQUAL expr 
-        { $$ = driver->tree.insert_log_op_node(AST::LogicalOpType::kNotEqual, $1, $3); }
+        { $$ = driver->tree.insert_log_op_node(ast::LogicalOpType::kNotEqual, $1, $3); }
     | expr BELOW expr 
-        { $$ = driver->tree.insert_log_op_node(AST::LogicalOpType::kBelow, $1, $3); }
+        { $$ = driver->tree.insert_log_op_node(ast::LogicalOpType::kBelow, $1, $3); }
     | expr GREATER expr 
-        { $$ = driver->tree.insert_log_op_node(AST::LogicalOpType::kGreater, $1, $3); }
+        { $$ = driver->tree.insert_log_op_node(ast::LogicalOpType::kGreater, $1, $3); }
     | expr EQUAL_OR_BELOW expr 
-        { $$ = driver->tree.insert_log_op_node(AST::LogicalOpType::kEqualOrBelow, $1, $3); }
+        { $$ = driver->tree.insert_log_op_node(ast::LogicalOpType::kEqualOrBelow, $1, $3); }
     | expr EQUAL_OR_GREATER expr 
-        { $$ = driver->tree.insert_log_op_node(AST::LogicalOpType::kEqualOrGreater, $1, $3); }
+        { $$ = driver->tree.insert_log_op_node(ast::LogicalOpType::kEqualOrGreater, $1, $3); }
     | decl 
         { $$ = $1; }
     | value 

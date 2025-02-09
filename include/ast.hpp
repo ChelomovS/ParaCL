@@ -2,14 +2,13 @@
 #define AST_HPP
 
 #include <string>
-#include <string_view>
 #include <vector>
 #include <iostream>
 #include <fstream> 
-#include <memory>
 
+#include "node_visitor.hpp"
 
-namespace AST {
+namespace ast {
 
 enum class TreeNodeType {
     kWhileNode        = 0,
@@ -22,20 +21,33 @@ enum class TreeNodeType {
     kBinOpNode        = 7,
     kQuestionMarkNode = 8,
     kScopeNode        = 9,
+    kExprNode         = 10,
 };
+
+class WhileNode;
+class IfNode;
+class ElseNode;
+class DeclNode;
+class AssignmentNode;
+class ValueNode;
+class PrintNode;
+class BinOpNode;
+class LogOpNode;
+class QuestionMarkNode;
+class ScopeNode;
+class ExprNode;
 
 class TreeNode {
   private:
     TreeNodeType node_type_;
   public:
     TreeNode(TreeNodeType node_type) : node_type_{node_type} {}
-    virtual ~TreeNode() {}
+    virtual ~TreeNode() = default;
+
+    virtual void accept(NodeVisitor* visitor) const = 0;
     virtual void print(std::ofstream& file) const = 0;
 
-  public: 
-    TreeNodeType get_type() const {
-        return node_type_;
-    }
+    TreeNodeType get_type() const { return node_type_; }
 };
 
 class WhileNode final : public TreeNode {
@@ -47,20 +59,12 @@ class WhileNode final : public TreeNode {
         : TreeNode{TreeNodeType::kWhileNode}, condition_node_{condition_node}, scope_node_{scope_node} {}
     ~WhileNode() {}
 
-    void print(std::ofstream& file) const override {
-        file << "\t\"" << this << "\" [label = \"While node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
-
-        if (condition_node_) {
-            file << "\t\"" << this << "\" -> \"" << condition_node_ << "\"" << std::endl;
-            condition_node_->print(file);
-        }
-
-        if (scope_node_) {
-            file << "\t\"" << this << "\" -> \"" << scope_node_ << "\"" << std::endl;
-            scope_node_->print(file);
-        }
-    }
-}; 
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override; 
+    
+    const TreeNode* get_cond() const { return condition_node_; }
+    const TreeNode* get_scope() const { return scope_node_; }
+};
 
 class IfNode final : public TreeNode {
   private:
@@ -72,24 +76,12 @@ class IfNode final : public TreeNode {
         : TreeNode{TreeNodeType::kIfNode}, condition_node_{condition_node}, scope_node_{scope_node}, else_node_{else_node} {}
     ~IfNode() {}
 
-    void print(std::ofstream& file) const override {
-        file << "\t\"" << this << "\" [label = \"If node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
 
-        if (condition_node_) {
-            file << "\t\"" << this << "\" -> \"" << condition_node_ << "\"" << std::endl;
-            condition_node_->print(file);
-        }
-
-        if (scope_node_) {
-            file << "\t\"" << this << "\" -> \"" << scope_node_ << "\"" << std::endl;
-            scope_node_->print(file);
-        }
-
-        if (else_node_) {
-            file << "\t\"" << this << "\" -> \"" << else_node_ << "\"" << std::endl;
-            else_node_->print(file);
-        }
-    }
+    const TreeNode* get_cond() const { return condition_node_; }
+    const TreeNode* get_scope() const { return scope_node_; }
+    const TreeNode* get_else() const { return else_node_; }
 };
 
 class ElseNode final: public TreeNode {
@@ -100,28 +92,24 @@ class ElseNode final: public TreeNode {
         : TreeNode{TreeNodeType::kElseNode}, scope_node_{scope_node} {}
     ~ElseNode() {}
 
-    void print(std::ofstream& file) const override {
-        file << "\t\"" << this << "\" [label = \"Else node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
 
-        if (scope_node_) {
-            file << "\t\"" << this << "\" -> \"" << scope_node_ << "\"" << std::endl;
-            scope_node_->print(file);
-        }
-    }
+    const TreeNode* get_scope() const { return scope_node_; }
  };
 
 class DeclNode final : public TreeNode {
   private:
     std::string variable_name_;
-    int value_ = 0;
   public:
     DeclNode(const std::string& variable_name) 
         : TreeNode{TreeNodeType::kDeclNode}, variable_name_{variable_name} {}
     ~DeclNode() {};
 
-    void print(std::ofstream& file) const override {
-        file << "\t\"" << this << "\" [label = \"Decl node (name of variable: " << variable_name_ << ")\", shape = \"octagon\", style = \"filled\", fillcolor = \"#95c9bc\"]";
-    }
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
+
+    std::string get_name() const { return variable_name_; }
 };
 
 class AssignmentNode final : public TreeNode {
@@ -133,19 +121,11 @@ class AssignmentNode final : public TreeNode {
         : TreeNode{TreeNodeType::kAssignmentNode}, decl_node_{decl_node}, expr_node_{expr_node} {}
     ~AssignmentNode() {};
 
-    void print(std::ofstream& file) const override {
-        file << "\t\"" << this << "\" [label = \"Assignment node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
 
-        if (decl_node_) {
-            file << "\t\"" << this << "\" -> \"" << decl_node_ << "\"" << std::endl;
-            decl_node_->print(file);
-        }
-
-        if (expr_node_) {
-            file << "\t\"" << this << "\" -> \"" << expr_node_ << "\"" << std::endl;
-            expr_node_->print(file);
-        }
-    }
+    const TreeNode* get_decl() const { return decl_node_; }
+    const TreeNode* get_expr() const { return expr_node_; }
 };
 
 class ValueNode final : public TreeNode {
@@ -156,9 +136,10 @@ class ValueNode final : public TreeNode {
         : TreeNode{TreeNodeType::kValueNode}, value_{value} {}
     ~ValueNode() {}
 
-    void print(std::ofstream& file) const override {
-        file << "\t\"" << this << "\" [label = \"Value node: " << value_ << "\", shape = \"octagon\", style = \"filled\", fillcolor = \"#a4c995\"]";
-    }
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
+
+    int get_value() const { return value_; }
 };
 
 class PrintNode final : public TreeNode {
@@ -170,14 +151,10 @@ class PrintNode final : public TreeNode {
 
     ~PrintNode() {}
 
-    void print(std::ofstream& file) const override {
-        file << "\t\"" << this << "\" [label = \"Print node\", shape = \"box\", style = \"filled\", fillcolor = \"#e00a07\"]";
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
 
-        if (node_to_print_) {
-            file << "\t\"" << this << "\" -> \"" << node_to_print_ << "\"" << std::endl;
-            node_to_print_->print(file);
-        }
-    }
+    const TreeNode* get_to_print() const { return node_to_print_; }
 };
 
 enum class BinaryOpType {
@@ -197,32 +174,12 @@ class BinOpNode final : public TreeNode {
         : TreeNode{TreeNodeType::kBinOpNode}, bin_op_{bin_op}, left_operand_{left_operand}, right_operand_{right_operand} {}
     ~BinOpNode() {}
 
-    void print(std::ofstream& file) const override {
-        switch (bin_op_) {
-            case BinaryOpType::kAdd:
-                file << "\t\"" << this << "\" [label = \"+ node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
-                break;
-            case BinaryOpType::kSub:
-                file << "\t\"" << this << "\" [label = \"- node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
-                break;
-            case BinaryOpType::kMul:
-                file << "\t\"" << this << "\" [label = \"* node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
-                break;
-            case BinaryOpType::kDiv:
-                file << "\t\"" << this << "\" [label = \"/ node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
-                break;
-        }
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
 
-        if (left_operand_) {
-            file << "\t\"" << this << "\" -> \"" << left_operand_ << "\"" << std::endl;
-            left_operand_->print(file);
-        }
-
-        if (right_operand_) {
-            file << "\t\"" << this << "\" -> \"" << right_operand_ << "\"" << std::endl;
-            right_operand_->print(file);
-        }
-    }
+    BinaryOpType get_bin_op() const { return bin_op_; }
+    const TreeNode* get_left_op() const { return left_operand_; }
+    const TreeNode* get_right_op() const { return right_operand_; }
 };
 
 enum class LogicalOpType {
@@ -244,38 +201,12 @@ class LogOpNode final : public TreeNode {
         : TreeNode{TreeNodeType::kBinOpNode}, log_op_{log_op}, left_operand_{left_operand}, right_operand_{right_operand} {}
     ~LogOpNode() {}
 
-    void print(std::ofstream& file) const override {
-        switch (log_op_) {
-            case LogicalOpType::kEqual:
-                file << "\t\"" << this << "\" [label = \"== node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
-                break;
-            case LogicalOpType::kNotEqual:
-                file << "\t\"" << this << "\" [label = \"!= node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
-                break;
-            case LogicalOpType::kBelow:
-                file << "\t\"" << this << "\" [label = \"< node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
-                break;
-            case LogicalOpType::kEqualOrBelow:
-                file << "\t\"" << this << "\" [label = \"<= node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
-                break;
-            case LogicalOpType::kGreater:
-                file << "\t\"" << this << "\" [label = \"> node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
-                break;
-            case LogicalOpType::kEqualOrGreater:
-                file << "\t\"" << this << "\" [label = \">= node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
-                break;
-        }
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
 
-        if (left_operand_) {
-            file << "\t\"" << this << "\" -> \"" << left_operand_ << "\"" << std::endl;
-            left_operand_->print(file);
-        }
-
-        if (right_operand_) {
-            file << "\t\"" << this << "\" -> \"" << right_operand_ << "\"" << std::endl;
-            right_operand_->print(file);
-        }
-    }
+    LogicalOpType get_logical_op() const { return log_op_; }
+    const TreeNode* get_left_op() const { return left_operand_; }
+    const TreeNode* get_right_op() const { return right_operand_; }
 };
 
 class QuestionMarkNode final : public TreeNode {
@@ -286,14 +217,10 @@ class QuestionMarkNode final : public TreeNode {
         : TreeNode{TreeNodeType::kQuestionMarkNode}, decl_node_{decl_node} {}
     ~QuestionMarkNode() {}
 
-    void print(std::ofstream& file) const override {
-        file << "\t\"" << this << "\" [label = \"? node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
 
-        if (decl_node_) {
-            file << "\t\"" << this << "\" -> \"" << decl_node_ << "\"" << std::endl;
-            decl_node_->print(file);
-        }
-    } 
+    const TreeNode* get_decl() const { return decl_node_; }
 };
 
 class ScopeNode final : public TreeNode {
@@ -306,20 +233,11 @@ class ScopeNode final : public TreeNode {
         : TreeNode{TreeNodeType::kScopeNode}, parent_node_{parent_node} {};
     ~ScopeNode() {}
 
-    void print(std::ofstream& file) const override {
-        if (parent_node_) {
-            file << "\t\"" << this << "\" [label = \"Scope\", shape = \"circle\"]";
-        } else {
-            file << "\t\"" << this << "\" [label = \"Global scope\", shape = \"circle\"]";
-        }
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
 
-        for (auto it : nodes_) {
-            if (it) {
-                file << "\t\"" << this << "\" -> \"" << it << "\"" << std::endl;
-                it->print(file);
-            }
-        }
-    }
+    const TreeNode* get_parent_scope() const { return parent_node_; } // NOTE ?????
+    const std::vector<TreeNode*>* get_nodes() const { return &nodes_; } // REVIEW
 
     void add_node(TreeNode* new_node) {
         nodes_.push_back(new_node);
@@ -328,6 +246,20 @@ class ScopeNode final : public TreeNode {
     ScopeNode* close_scope() {
         return parent_node_;
     }
+};
+
+class ExprNode final : public TreeNode {
+  private:
+    TreeNode* expr_node_;
+  public:
+    ExprNode(TreeNode* expr_node) 
+        : TreeNode{TreeNodeType::kExprNode}, expr_node_{expr_node} {}
+    ~ExprNode() {}
+
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
+
+    const TreeNode* get_expr() const { return expr_node_; }
 };
 
 class Ast final {
@@ -340,19 +272,7 @@ class Ast final {
         return nodes_.empty();
     }
 
-    void print(std::ofstream& file) const {
-        file.open("../graphviz/graph.dot");
-        file << "digraph G{" << std::endl;
-        if (root_) {
-            root_->print(file);
-        }
-        file << "}";  
-        file.close();
-
-        char call_graph[100] = " ";
-        snprintf(call_graph, 100, "dot ../graphviz/graph.dot -Tpng -o ../graphviz/graph.png");
-        system(call_graph);
-    }
+    void print(std::ofstream& file) const;
 
     WhileNode* insert_while_node(TreeNode* condition_node = nullptr, TreeNode* scope_node = nullptr) {
         WhileNode* new_while_node = new WhileNode{condition_node, scope_node};
@@ -418,6 +338,12 @@ class Ast final {
         ScopeNode* new_scope_node = new ScopeNode{parent_node};
         nodes_.push_back(new_scope_node);
         return static_cast<ScopeNode*>(nodes_.back());
+    }
+
+    ExprNode* insert_expr_node(TreeNode* expr_node = nullptr) {
+        ExprNode* new_expr_node = new ExprNode{expr_node};
+        nodes_.push_back(new_expr_node);
+        return static_cast<ExprNode*>(nodes_.back());
     }
 };
 
