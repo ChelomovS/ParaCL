@@ -10,8 +10,6 @@
 #include "driver.hpp"
 #include "interpreter.hpp"
 
-int yyFlexLexer::yywrap() { return 1; }
-    
 int main(const int argc, const char* argv[]) {
     auto logger = spdlog::basic_logger_mt("paracl", "../paracl.log", /*override log?*/ true);
     spdlog::set_default_logger(logger);
@@ -48,20 +46,19 @@ int main(const int argc, const char* argv[]) {
 
     FlexLexer *lexer = new yyFlexLexer(&pcl_src_file);
     yy::Driver driver(lexer);
-    driver.parse();
-
-    spdlog::info("parse completed");
+    bool no_errors = driver.parse();
+    spdlog::info("parse completed: {}", no_errors);
 
     std::ofstream dump_file{}; // FIXME 
     driver.tree.print(dump_file);
-
-    ast::Ast ast = driver.tree;
-    delete lexer;
     
-    intpr::Interpreter interpreter(ast);
-    interpreter.visit_all();
+    if (no_errors) {
+        intpr::Interpreter interpreter(driver.tree);
+        interpreter.visit_all();
+        spdlog::info("interpreter completed");
+    }
 
-    spdlog::info("interpreter completed");
+    delete lexer;
     
     return 0;
 }
