@@ -22,8 +22,9 @@ add_flex_bison_dependency(scanner parser)
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 
 add_executable(${PROJECT_NAME} 
-  source/driver.cpp
   source/main.cpp
+  source/ast.cpp
+  source/interpreter.cpp
   ${BISON_parser_OUTPUTS}
   ${FLEX_scanner_OUTPUTS}
 )

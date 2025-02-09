@@ -17,8 +17,8 @@ class Driver {
     FlexLexer *plex_;
 
   public:
-    AST::Ast tree;
-    AST::ScopeNode* current_scope_;
+    ast::Ast tree;
+    ast::ScopeNode* current_scope_;
     // maybe тут calculator
     Driver(FlexLexer *plex) : plex_{plex}, current_scope_{tree.insert_scope_node(nullptr)} {tree.root_ = current_scope_;};
     
@@ -47,7 +47,7 @@ class Driver {
         return !res;
     }
     
-    void add_node(AST::TreeNode* new_node) {
+    void add_node(ast::TreeNode* new_node) {
         current_scope_->add_node(new_node);
     }
       
