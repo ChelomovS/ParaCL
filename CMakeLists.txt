@@ -42,3 +42,18 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wpedantic -g -Og -ggdb -DDEBUG -Wunused -Wshadow -fsanitize=address -fsanitize=undefined")
+
+# use cpm package manager
+include(cmake/CPM.cmake)
+
+CPMAddPackage(
+    NAME spdlog
+    GITHUB_REPOSITORY gabime/spdlog
+    GIT_TAG v1.15.0
+)
+
+if (spdlog_ADDED)
+    # message(STATUS "spdlog src dir: ${spdlog_SOURCE_DIR}")
+    target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
+    # target_include_directories(${PROJECT_NAME} PRIVATE "${spdlog_SOURCE_DIR}/include/")
+endif()
