@@ -4,6 +4,7 @@
 #include <string>
 #include <deque>
 #include <fstream> 
+#include <vector>
 
 #include "node_visitor.hpp"
 
