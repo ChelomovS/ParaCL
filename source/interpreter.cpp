@@ -3,6 +3,7 @@
 #include <ostream>
 
 #include <spdlog/spdlog.h>
+
 #include <stdexcept>
 #include <vector>
 
@@ -94,7 +95,7 @@ void Interpreter::visit(const ast::AssignmentNode& node) {
 
     expr_node->accept(this);
     int expr_value = eval_stack.back();
-    eval_stack.pop_back();
+    // dont pop because b = a = expr 
 
     std::string var_name = decl_node->get_name();
 

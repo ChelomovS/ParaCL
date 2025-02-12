@@ -176,10 +176,10 @@ assignment: decl ASSIGNMENT comp_expr
         }
 ;
 
-print: PRINT LEFT_ROUND_BRACKER comp_expr RIGHT_ROUND_BRACKER 
-        { 
-            parse_trace("Reducing: print -> PRINT LEFT_ROUND_BRACKER comp_expr RIGHT_ROUND_BRACKER"); 
-            $$ = driver->tree.insert_print_node($3); 
+print: PRINT comp_expr  
+        {
+            parse_trace("Reducing: print -> PRINT comp_expr"); 
+            $$ = driver->tree.insert_print_node($2); 
         }
 ;
 
@@ -270,6 +270,11 @@ expr: expr PLUS expr
         { 
             parse_trace("Reducing: expr -> expr EQUAL_OR_GREATER expr"); 
             $$ = driver->tree.insert_log_op_node(ast::LogicalOpType::kEqualOrGreater, $1, $3); 
+        }
+    | assignment
+        {
+            parse_trace("Reducing: expr -> assignment"); 
+            $$ = $1; 
         }
     | var_deref 
         { 

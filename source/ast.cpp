@@ -1,5 +1,7 @@
 #include "ast.hpp"
 
+#include <iostream>
+
 namespace ast {
 
 void WhileNode::print(std::ofstream& file) const {
@@ -51,7 +53,6 @@ void DeclNode::print(std::ofstream& file) const {
 void VarDerefNode::print(std::ofstream& file) const {
     file << "\t\"" << this << "\" [label = \"VarDeref node (name of variable: " << variable_name_ << ")\", shape = \"octagon\", style = \"filled\", fillcolor = \"#95c9bc\"]";
 }
-
 
 void AssignmentNode::print(std::ofstream& file) const {
     file << "\t\"" << this << "\" [label = \"Assignment node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
@@ -142,11 +143,6 @@ void LogOpNode::print(std::ofstream& file) const {
 
 void QuestionMarkNode::print(std::ofstream& file) const {
     file << "\t\"" << this << "\" [label = \"? node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
-
-    // if (decl_node_) {
-    //     file << "\t\"" << this << "\" -> \"" << decl_node_ << "\"" << std::endl;
-    //     decl_node_->print(file);
-    // }
 } 
 
 void ScopeNode::print(std::ofstream& file) const {
@@ -174,19 +170,26 @@ void ExprNode::print(std::ofstream& file) const {
 }
 
 void Ast::print(std::ofstream& file) const {
-    file.open("../graphviz/graph.dot");
-    file << "digraph G{" << std::endl;
-    if (root_) {
-        root_->print(file);
+
+    std::filesystem::path graphviz_dir = "../graphviz";
+    if (!std::filesystem::exists(graphviz_dir)) {
+        std::filesystem::create_directory(graphviz_dir);
     }
-    file << "}";  
-    file.close();
 
-    char call_graph[100] = " ";
-    snprintf(call_graph, 100, "dot ../graphviz/graph.dot -Tpng -o ../graphviz/graph.png");
-    system(call_graph);
+    std::filesystem::path dot_file = graphviz_dir / "graph.dot";
+    {
+        std::ofstream file(dot_file);
+
+        file << "digraph G{" << std::endl;
+        if (root_) {
+            root_->print(file);
+        }
+        file << "}";
+    }
+    
+    std::filesystem::path image_file = graphviz_dir / "graph.png";
+    std::string command = "dot " + dot_file.string() + " -Tpng -o " + image_file.string();
+    system(command.c_str());
 }
-
-
 
 } // namespace ast

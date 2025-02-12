@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 project(ParaCL)
 
+set(FLEX_INCLUDE_DIR "/usr/include" CACHE PATH "Path to Flex include directory")
+
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
@@ -21,7 +23,7 @@ add_flex_bison_dependency(scanner parser)
 
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 
-add_executable(${PROJECT_NAME} 
+add_executable(${PROJECT_NAME}
     source/main.cpp
     source/ast.cpp
     source/interpreter.cpp
@@ -34,16 +36,14 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
-
-include_directories(${FLEX_INCLUDE_DIR})
-
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
+target_include_directories(${PROJECT_NAME} PRIVATE ${FLEX_INCLUDE_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wpedantic -g -Og -ggdb -DDEBUG -Wunused -Wshadow -fsanitize=address,undefined,leak")
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
-# use cpm package manager
+set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wpedantic -g -Og -ggdb -DDEBUG -Wunused -Wshadow -Wconflicts-sr -fsanitize=address,undefined")
+
 include(cmake/CPM.cmake)
 
 CPMAddPackage(
@@ -53,7 +53,5 @@ CPMAddPackage(
 )
 
 if (spdlog_ADDED)
-    # message(STATUS "spdlog src dir: ${spdlog_SOURCE_DIR}")
     target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
-    # target_include_directories(${PROJECT_NAME} PRIVATE "${spdlog_SOURCE_DIR}/include/")
-endif()
+endif() 

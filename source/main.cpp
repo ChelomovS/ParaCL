@@ -60,5 +60,5 @@ int main(const int argc, const char* argv[]) {
 
     delete lexer;
     
-    return 0;
+    return EXIT_SUCCESS;
 }

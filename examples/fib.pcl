@@ -1,7 +1,8 @@
 fib = ?;         
 a = 0;            
 b = 1;            
-i = 0;            
+i = 0;   
+         
 while (i < fib) { 
     temp = a + b;   
     a = b;          
@@ -9,4 +10,4 @@ while (i < fib) {
     i = i + 1;      
 }
 
-print(a);
+print a;
