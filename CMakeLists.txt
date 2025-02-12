@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 project(ParaCL)
 
-set(FLEX_INCLUDE_DIR "/usr/include" CACHE PATH "Path to Flex include directory")
-
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
@@ -35,10 +33,12 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
 endif()
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
-target_include_directories(${PROJECT_NAME} PRIVATE ${FLEX_INCLUDE_DIR})
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${INCLUDE_DIR}
+    ${FLEX_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 

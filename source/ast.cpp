@@ -1,6 +1,7 @@
 #include "ast.hpp"
 
 #include <iostream>
+#include <filesystem>
 
 namespace ast {
 

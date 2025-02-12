@@ -1,0 +1,36 @@
+name: ParaCL
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install GTest and G++
+      run: |
+          sudo apt-get install -y libgtest-dev cmake g++ flex bison libfl-dev
+
+    - name: сheck versions of Flex and Bison 
+      run: |
+        flex --version
+        bison --version
+      
+    - name: cmake release build  
+      run: |
+        cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
+        cmake --build build/release
+        cd build/release
+
+    - name: cmake debug build  
+      run: |
+        cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug
+        cmake --build build/debug
+        cd build/debug
