@@ -49,9 +49,10 @@ int main(const int argc, const char* argv[]) {
     bool no_errors = driver.parse();
     spdlog::info("parse completed: {}", no_errors);
 
-    std::ofstream dump_file{}; // FIXME 
-    driver.tree.print(dump_file);
-    
+    #if GRAPHVIZ
+    driver.tree.print();
+    #endif 
+
     if (no_errors) {
         intpr::Interpreter interpreter(driver.tree);
         interpreter.visit_all();

@@ -1,0 +1,13 @@
+if (x = 1) {
+    print 1; // 1 printed
+} else {
+    print 2;
+}
+
+if (x == 0) {
+    print 1;
+} else {
+    print 2; // 2 printed
+}
+
+// printed 12

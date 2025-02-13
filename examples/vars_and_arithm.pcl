@@ -1,0 +1,6 @@
+a = 2;
+b = 3;
+c = a + b;
+d = c * 2;
+print c; // 5 printed
+print d; // 10 printed

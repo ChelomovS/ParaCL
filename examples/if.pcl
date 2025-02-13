@@ -1,0 +1,20 @@
+if (8 > 8 )
+print 1; // nothing 
+
+if (8 < 8 )
+print 2; // nothing 
+
+if (8 < 8 ) {
+    print 3; // nothing 
+}
+
+if (8 < 8 ) {
+    print 3; // nothing 
+}
+
+if (8 > 8 ) {
+    print 4; // nothing 
+}
+
+if (8 == 8 ) 
+print 5; // 5 printed  

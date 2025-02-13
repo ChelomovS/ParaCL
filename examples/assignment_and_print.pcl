@@ -1,0 +1,4 @@
+k = (i = (j = 9) + 5) * 3;
+print j; // 9 printed
+print i; // 14 printed
+print k; // 42 printed

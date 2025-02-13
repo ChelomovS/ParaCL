@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 project(ParaCL)
 
+set(FLEX_INCLUDE_DIR "/usr/include" CACHE PATH "path to flex include dir")
+
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
@@ -42,7 +44,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
-set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wpedantic -g -Og -ggdb -DDEBUG -Wunused -Wshadow -Wconflicts-sr -fsanitize=address,undefined")
+set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wpedantic -g -Og -ggdb -DDEBUG -Wunused -Wshadow -fsanitize=address,undefined")
 
 include(cmake/CPM.cmake)
 
@@ -55,3 +57,5 @@ CPMAddPackage(
 if (spdlog_ADDED)
     target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
 endif() 
+
+add_subdirectory(tests)

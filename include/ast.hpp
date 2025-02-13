@@ -253,8 +253,9 @@ class ScopeNode final : public TreeNode {
     const TreeNode* get_parent_scope() const { return parent_node_; } // NOTE ?????
     const std::deque<TreeNode*>* get_nodes() const { return &nodes_; } // REVIEW
 
-    void add_node(TreeNode* new_node) {
+    ScopeNode* add_node(TreeNode* new_node) {
         nodes_.push_front(new_node);
+        return this; 
     }
 
     ScopeNode* close_scope() {
