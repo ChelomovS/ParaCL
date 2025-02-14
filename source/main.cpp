@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iostream>
 
-#include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
@@ -11,7 +10,7 @@
 #include "interpreter.hpp"
 
 int main(const int argc, const char* argv[]) {
-    auto logger = spdlog::basic_logger_mt("paracl", "../paracl.log", /*override log?*/ true);
+    auto logger = spdlog::basic_logger_mt("paracl", "paracl.log", /*override log?*/ true);
     spdlog::set_default_logger(logger);
 
 #if defined (NDEBUG)
@@ -49,8 +48,10 @@ int main(const int argc, const char* argv[]) {
     bool no_errors = driver.parse();
     spdlog::info("parse completed: {}", no_errors);
 
+    #define GRAPHVIZ 1
     #if GRAPHVIZ
     driver.tree.print();
+    spdlog::debug("graphviz dumped");
     #endif 
 
     if (no_errors) {

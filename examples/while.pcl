@@ -1,8 +1,9 @@
-n = 1000000;
+n = 100000;
+//n = 100;
 i = 0;
 
 while (i < n) {
     i = i + 1;
 }
 
-print i; // 1000000 printed
+print i; // 100000 printed

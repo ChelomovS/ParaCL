@@ -3,6 +3,8 @@
 #include <iostream>
 #include <filesystem>
 
+#include <spdlog/spdlog.h>
+
 namespace ast {
 
 void WhileNode::print(std::ofstream& file) const {
@@ -170,8 +172,7 @@ void ExprNode::print(std::ofstream& file) const {
     }
 }
 
-void Ast::print(std::ofstream& file) const {
-
+void Ast::print() const {
     std::filesystem::path graphviz_dir = "../graphviz";
     if (!std::filesystem::exists(graphviz_dir)) {
         std::filesystem::create_directory(graphviz_dir);
@@ -190,7 +191,10 @@ void Ast::print(std::ofstream& file) const {
     
     std::filesystem::path image_file = graphviz_dir / "graph.png";
     std::string command = "dot " + dot_file.string() + " -Tpng -o " + image_file.string();
-    system(command.c_str());
+
+    spdlog::debug("command for system: {}", command);
+    int sys_res = system(command.c_str());
+    spdlog::debug("system on graphviz: {}", sys_res);
 }
 
 } // namespace ast
