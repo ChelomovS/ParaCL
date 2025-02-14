@@ -7,38 +7,36 @@
 #include <stdexcept>
 #include <cassert>
 
+#include <spdlog/spdlog.h>
+#include <spdlog/fmt/ranges.h>
+
 class EntityTable {
   private:
-    class EntityScope {
-      public:
-        std::unordered_map<std::string, int> variables;
-
-        bool contains(std::string name) const {
-            return variables.find(name) != variables.end();
-        }
-    };
-
-    std::list<EntityScope> scopes; 
+    using EntityScope = std::unordered_map<std::string, int>;
+    std::list<EntityScope> scopes_;
 
   public:
     EntityTable() {
-        scopes.emplace_back(); // global scope
+        scopes_.emplace_back(); // global scope
     }
     
     void push_scope() {
-        scopes.emplace_back();
+        scopes_.emplace_back();
+        spdlog::trace("add scope on top");
     }
 
     void pop_scope() {
-        if (scopes.size() > 1) {
-            scopes.pop_back();
+        if (scopes_.size() > 1) {
+            scopes_.pop_back();
         } else {
             throw std::runtime_error("Cannot pop global scope");
         }
+        spdlog::trace("remove scope from top");
     }
 
-    bool is_declared(std::string name) const {
-        for (auto iter_scopes = scopes.rbegin(); iter_scopes != scopes.rend(); ++iter_scopes) {
+    // checks is variable declared at all
+    bool is_declared_global(std::string name) const { 
+        for (auto iter_scopes = scopes_.rbegin(); iter_scopes != scopes_.rend(); ++iter_scopes) {
             if (iter_scopes->contains(name)) {
                 return true;
             }
@@ -47,18 +45,23 @@ class EntityTable {
         return false;
     }
 
+    // checks is variable declared in currenct scope
+    bool is_declared_scope(std::string name) const { 
+        return scopes_.back().contains(name);
+    }
+
     void declare(std::string name, int value) {
         // NOTE maybe throw if variable is declared
 
-        assert(!scopes.empty());
+        assert(!scopes_.empty());
         
-        scopes.back().variables.emplace(std::string(name), value);
+        scopes_.back().emplace(std::string(name), value);
     }
 
     void assign(std::string name, int value) {
-        for (auto iter_scopes = scopes.rbegin(); iter_scopes != scopes.rend(); ++iter_scopes) {
+        for (auto iter_scopes = scopes_.rbegin(); iter_scopes != scopes_.rend(); ++iter_scopes) {
             if (iter_scopes->contains(name)) {
-                iter_scopes->variables[std::string(name)] = value;
+                iter_scopes->at(std::string(name)) = value;
                 return ;
             }
         }
@@ -67,13 +70,17 @@ class EntityTable {
     }
 
     int lookup(std::string name) const {
-        for (auto iter_scopes = scopes.rbegin(); iter_scopes != scopes.rend(); ++iter_scopes) {
+        for (auto iter_scopes = scopes_.rbegin(); iter_scopes != scopes_.rend(); ++iter_scopes) {
             if (iter_scopes->contains(name)) {
-                return iter_scopes->variables.at(std::string(name));
+                return iter_scopes->at(std::string(name));
             }
         }
 
         throw std::runtime_error("Variable " + std::string(name) + "was not declared");   
+    }
+
+    void log() {
+        spdlog::trace("scopes: {}", scopes_);
     }
 };
 

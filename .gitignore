@@ -1,6 +1,15 @@
+# build dirs
 build/
+dbuild/
+rbuild/
+
+# ide/lsp files
 compile_commands.json
 .cache/
 .vscode
-graphviz
+
+# log files
 *.log
+
+# other
+graphviz

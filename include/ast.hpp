@@ -288,7 +288,7 @@ class Ast final {
         return nodes_.empty();
     }
 
-    void print(std::ofstream& file) const;
+    void print() const;
 
     WhileNode* insert_while_node(TreeNode* condition_node = nullptr, TreeNode* scope_node = nullptr) {
         WhileNode* new_while_node = new WhileNode{condition_node, scope_node};

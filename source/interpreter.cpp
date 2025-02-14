@@ -1,18 +1,17 @@
 #include "interpreter.hpp"
 
 #include <ostream>
-
-#include <spdlog/spdlog.h>
-
 #include <stdexcept>
 #include <vector>
+
+#include <spdlog/spdlog.h>
 
 #include "ast.hpp"
 
 namespace intpr {
 
-#if 0
-#define trace_calls() spdlog::trace("{}", __PRETTY_FUNCTION__)
+#if 1
+#define trace_calls() spdlog::debug("{}", __PRETTY_FUNCTION__)
 #else 
 #define trace_calls() ;
 #endif // trace_calls
@@ -42,9 +41,9 @@ void Interpreter::visit(const ast::WhileNode& node) {
 void Interpreter::visit(const ast::IfNode& node) {
     trace_calls();
 
-    const ast::ExprNode* cond_node = static_cast<const ast::ExprNode*>(node.get_cond());
-    const ast::ScopeNode* scope_node = static_cast<const ast::ScopeNode*>(node.get_scope());
-    const ast::ElseNode* else_node = static_cast<const ast::ElseNode*>(node.get_else());
+    const ast::TreeNode* cond_node = node.get_cond();
+    const ast::TreeNode* scope_node = node.get_scope();
+    const ast::TreeNode* else_node = node.get_else();
 
     cond_node->accept(this);
     int cond_value = eval_stack.back();
@@ -52,7 +51,7 @@ void Interpreter::visit(const ast::IfNode& node) {
 
     if (cond_value) {
         scope_node->accept(this);
-    } else {
+    } else if (else_node != nullptr) {
         else_node->accept(this);
     }
 }
@@ -60,7 +59,7 @@ void Interpreter::visit(const ast::IfNode& node) {
 void Interpreter::visit(const ast::ElseNode& node) {
     trace_calls();
 
-    const ast::ScopeNode* scope_node = static_cast<const ast::ScopeNode*>(node.get_scope());
+    const ast::TreeNode* scope_node = node.get_scope();
 
     scope_node->accept(this);
 }
@@ -78,7 +77,7 @@ void Interpreter::visit(const ast::VarDerefNode& node) {
 
     std::string var_name = node.get_name();
 
-    if (entity_table.is_declared(var_name)) {
+    if (entity_table.is_declared_global(var_name)) {
         int var_value = entity_table.lookup(var_name);
         eval_stack.push_back(var_value);
     } else {
@@ -91,15 +90,18 @@ void Interpreter::visit(const ast::AssignmentNode& node) {
     trace_calls();
 
     const ast::DeclNode* decl_node = static_cast<const ast::DeclNode*>(node.get_decl());
-    const ast::ExprNode* expr_node = static_cast<const ast::ExprNode*>(node.get_expr());
+    const ast::TreeNode* expr_node = node.get_expr();
 
     expr_node->accept(this);
     int expr_value = eval_stack.back();
-    // dont pop because b = a = expr 
+    // dont pop because c = b = a = expr; chain assignment
 
     std::string var_name = decl_node->get_name();
 
-    if (entity_table.is_declared(var_name)) {
+    bool is_declared_scope = entity_table.is_declared_global(var_name);
+    spdlog::trace("is variable [{}] decalred in scope [{}]", var_name, is_declared_scope);
+    entity_table.log();
+    if (is_declared_scope) {
         entity_table.assign(var_name, expr_value);
     } else {
         entity_table.declare(var_name, expr_value);
@@ -115,13 +117,19 @@ void Interpreter::visit(const ast::ValueNode& node) {
 void Interpreter::visit(const ast::PrintNode& node) {
     trace_calls();
 
-    const ast::ExprNode* expr_node = static_cast<const ast::ExprNode*>(node.get_to_print());
+    const ast::TreeNode* expr_node = node.get_to_print();
     expr_node->accept(this);
 
     int value_to_print = eval_stack.back();
     eval_stack.pop_back();
 
-    std::cout << "Print: " << value_to_print << std::endl;
+#if 0
+    std::string helper = "Print: ";
+#else
+    std::string helper = "";
+#endif // helper
+
+    std::cout << helper << value_to_print << std::endl;
 }
 
 void Interpreter::visit(const ast::BinOpNode& node) {
@@ -181,26 +189,33 @@ void Interpreter::visit(const ast::LogOpNode& node) {
     int right_op = eval_stack.back();
     eval_stack.pop_back();
 
+    spdlog::trace("left value: {}, right value: {}", left_op, right_op);
     int res = 0;
     switch (logical_op) {
         using enum ast::LogicalOpType;
         case kEqual:
-            res = left_op == right_op;
+            res = (left_op == right_op);
+            spdlog::trace("kEqual res = {}", res);
             break;
         case kNotEqual:
-            res = left_op != right_op;
+            res = (left_op != right_op);
+            spdlog::trace("kNotEqual res = {}", res);
             break;
         case kBelow:
-            res = left_op < right_op;
+            res = (left_op < right_op);
+            spdlog::trace("kBelow res = {}", res);
             break;
         case kEqualOrBelow:
-            res = left_op <= right_op;
+            res = (left_op <= right_op);
+            spdlog::trace("kEqualOrBelow res = {}", res);
             break;
         case kGreater:
-            res = left_op > right_op;
+            res = (left_op > right_op);
+            spdlog::trace("kGreater res = {}", res);
             break;
         case kEqualOrGreater:
-            res = left_op >= right_op;
+            res = (left_op >= right_op);
+            spdlog::trace("kEqualOrGreater res = {}", res);
             break;
         default:
             spdlog::critical("unknown logical operation");
@@ -216,12 +231,21 @@ void Interpreter::visit(const ast::QuestionMarkNode& node) {
     (void)node;
 
     int input_value = 0;
+#if 0
+    std::string helper = "Input: ";
+#else 
+    std::string helper = "";
+#endif // helper
+
+    std::cout << helper;
     std::cin >> input_value;
     eval_stack.push_back(input_value);
 }   
 
 void Interpreter::visit(const ast::ScopeNode& node) {
     trace_calls();
+
+    entity_table.push_scope(); // push new scope on top
 
     auto nodes = node.get_nodes();
     for (auto it: *nodes) {
@@ -231,6 +255,8 @@ void Interpreter::visit(const ast::ScopeNode& node) {
 
         it->accept(this);
     }
+
+    entity_table.pop_scope(); // pop scope from top
 }
 
 void Interpreter::visit(const ast::ExprNode& node) {
