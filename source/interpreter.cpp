@@ -28,13 +28,19 @@ void Interpreter::visit(const ast::WhileNode& node) {
     const ast::TreeNode* cond_node = node.get_cond(); 
     const ast::TreeNode* scope_node = node.get_scope();
 
+    EntityTable::EntityScope scope = EntityTable::EntityScope{};
+
     while (true) {
         cond_node->accept(this);
+    
         int expr_value = eval_stack.back();
         eval_stack.pop_back();
         if (!expr_value) { break; }
 
+        entity_table.push_scope(scope);
         scope_node->accept(this);
+        scope = entity_table.top_scope();
+        entity_table.pop_scope();
     }
 }
 
@@ -48,12 +54,16 @@ void Interpreter::visit(const ast::IfNode& node) {
     cond_node->accept(this);
     int cond_value = eval_stack.back();
     eval_stack.pop_back();
+        
+    entity_table.push_scope();
 
     if (cond_value) {
         scope_node->accept(this);
     } else if (else_node != nullptr) {
         else_node->accept(this);
     }
+
+    entity_table.pop_scope();
 }
 
 void Interpreter::visit(const ast::ElseNode& node) {
@@ -245,7 +255,7 @@ void Interpreter::visit(const ast::QuestionMarkNode& node) {
 void Interpreter::visit(const ast::ScopeNode& node) {
     trace_calls();
 
-    entity_table.push_scope(); // push new scope on top
+    // entity_table.push_scope(); // push new scope on top
 
     auto nodes = node.get_nodes();
     for (auto it: *nodes) {
@@ -256,7 +266,7 @@ void Interpreter::visit(const ast::ScopeNode& node) {
         it->accept(this);
     }
 
-    entity_table.pop_scope(); // pop scope from top
+    // entity_table.pop_scope(); // pop scope from top
 }
 
 void Interpreter::visit(const ast::ExprNode& node) {
