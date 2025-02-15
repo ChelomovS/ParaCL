@@ -1,0 +1,6 @@
+x = 1;
+if (1) {
+    x = 2;
+}
+
+print x; // printed 2
