@@ -10,6 +10,7 @@ compile_commands.json
 
 # log files
 *.log
+log
 
 # other
 graphviz
