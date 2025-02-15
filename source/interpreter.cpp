@@ -116,6 +116,7 @@ void Interpreter::visit(const ast::AssignmentNode& node) {
     } else {
         entity_table.declare(var_name, expr_value);
     }
+    entity_table.log();
 }
 
 void Interpreter::visit(const ast::ValueNode& node) {
