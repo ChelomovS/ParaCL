@@ -8,7 +8,7 @@
 namespace ast {
 
 void WhileNode::print(std::ofstream& file) const {
-    file << "\t\"" << this << "\" [label = \"While node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+    file << "\t\"" << this << "\" [label = \"While\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
 
     if (condition_node_) {
         file << "\t\"" << this << "\" -> \"" << condition_node_ << "\"" << std::endl;
@@ -22,7 +22,7 @@ void WhileNode::print(std::ofstream& file) const {
 }
 
 void IfNode::print(std::ofstream& file) const {
-    file << "\t\"" << this << "\" [label = \"If node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+    file << "\t\"" << this << "\" [label = \"If\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
 
     if (condition_node_) {
         file << "\t\"" << this << "\" -> \"" << condition_node_ << "\"" << std::endl;
@@ -41,7 +41,7 @@ void IfNode::print(std::ofstream& file) const {
 }
 
 void ElseNode::print(std::ofstream& file) const {
-    file << "\t\"" << this << "\" [label = \"Else node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+    file << "\t\"" << this << "\" [label = \"Else\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
 
     if (scope_node_) {
         file << "\t\"" << this << "\" -> \"" << scope_node_ << "\"" << std::endl;
@@ -50,15 +50,15 @@ void ElseNode::print(std::ofstream& file) const {
 }
 
 void DeclNode::print(std::ofstream& file) const {
-    file << "\t\"" << this << "\" [label = \"Decl node (name of variable: " << variable_name_ << ")\", shape = \"octagon\", style = \"filled\", fillcolor = \"#95c9bc\"]";
+    file << "\t\"" << this << "\" [label = \"Decl (" << variable_name_ << ")\", shape = \"box\", style = \"filled\", fillcolor = \"#95c9bc\"]";
 }
 
 void VarDerefNode::print(std::ofstream& file) const {
-    file << "\t\"" << this << "\" [label = \"VarDeref node (name of variable: " << variable_name_ << ")\", shape = \"octagon\", style = \"filled\", fillcolor = \"#95c9bc\"]";
+    file << "\t\"" << this << "\" [label = \"VarDeref (" << variable_name_ << ")\", shape = \"box\", style = \"filled\", fillcolor = \"#95c9bc\"]";
 }
 
 void AssignmentNode::print(std::ofstream& file) const {
-    file << "\t\"" << this << "\" [label = \"Assignment node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+    file << "\t\"" << this << "\" [label = \"Assignment\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
 
     if (decl_node_) {
         file << "\t\"" << this << "\" -> \"" << decl_node_ << "\"" << std::endl;
@@ -72,11 +72,11 @@ void AssignmentNode::print(std::ofstream& file) const {
 }
 
 void ValueNode::print(std::ofstream& file) const {
-    file << "\t\"" << this << "\" [label = \"Value node: " << value_ << "\", shape = \"octagon\", style = \"filled\", fillcolor = \"#a4c995\"]";
+    file << "\t\"" << this << "\" [label = \"Value (" << value_ << ")\", shape = \"box\", style = \"filled\", fillcolor = \"#a4c995\"]";
 }
 
 void PrintNode::print(std::ofstream& file) const {
-    file << "\t\"" << this << "\" [label = \"Print node\", shape = \"box\", style = \"filled\", fillcolor = \"#e00a07\"]";
+    file << "\t\"" << this << "\" [label = \"Print\", shape = \"box\", style = \"filled\", fillcolor = \"#e00a07\"]";
 
     if (node_to_print_) {
         file << "\t\"" << this << "\" -> \"" << node_to_print_ << "\"" << std::endl;
@@ -87,16 +87,16 @@ void PrintNode::print(std::ofstream& file) const {
 void BinOpNode::print(std::ofstream& file) const {
     switch (bin_op_) {
         case BinaryOpType::kAdd:
-            file << "\t\"" << this << "\" [label = \"+ node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            file << "\t\"" << this << "\" [label = \"+\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
             break;
         case BinaryOpType::kSub:
-            file << "\t\"" << this << "\" [label = \"- node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            file << "\t\"" << this << "\" [label = \"-\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
             break;
         case BinaryOpType::kMul:
-            file << "\t\"" << this << "\" [label = \"* node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            file << "\t\"" << this << "\" [label = \"*\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
             break;
         case BinaryOpType::kDiv:
-            file << "\t\"" << this << "\" [label = \"/ node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            file << "\t\"" << this << "\" [label = \"/\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
             break;
     }
 
@@ -114,22 +114,22 @@ void BinOpNode::print(std::ofstream& file) const {
 void LogOpNode::print(std::ofstream& file) const {
     switch (log_op_) {
         case LogicalOpType::kEqual:
-            file << "\t\"" << this << "\" [label = \"== node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            file << "\t\"" << this << "\" [label = \"==\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
             break;
         case LogicalOpType::kNotEqual:
-            file << "\t\"" << this << "\" [label = \"!= node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            file << "\t\"" << this << "\" [label = \"!=\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
             break;
         case LogicalOpType::kBelow:
-            file << "\t\"" << this << "\" [label = \"< node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            file << "\t\"" << this << "\" [label = \"<\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
             break;
         case LogicalOpType::kEqualOrBelow:
-            file << "\t\"" << this << "\" [label = \"<= node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            file << "\t\"" << this << "\" [label = \"<=\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
             break;
         case LogicalOpType::kGreater:
-            file << "\t\"" << this << "\" [label = \"> node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            file << "\t\"" << this << "\" [label = \">\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
             break;
         case LogicalOpType::kEqualOrGreater:
-            file << "\t\"" << this << "\" [label = \">= node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            file << "\t\"" << this << "\" [label = \">=\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
             break;
     }
 
@@ -145,14 +145,14 @@ void LogOpNode::print(std::ofstream& file) const {
 }
 
 void QuestionMarkNode::print(std::ofstream& file) const {
-    file << "\t\"" << this << "\" [label = \"? node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+    file << "\t\"" << this << "\" [label = \"?\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
 } 
 
 void ScopeNode::print(std::ofstream& file) const {
     if (parent_node_) {
-        file << "\t\"" << this << "\" [label = \"Scope\", shape = \"circle\"]";
+        file << "\t\"" << this << "\" [label = \"Scope\", shape = \"box\"]";
     } else {
-        file << "\t\"" << this << "\" [label = \"Global scope\", shape = \"circle\"]";
+        file << "\t\"" << this << "\" [label = \"Global scope\", shape = \"box\"]";
     }
 
     for (auto it : nodes_) {
@@ -164,7 +164,7 @@ void ScopeNode::print(std::ofstream& file) const {
 }
 
 void ExprNode::print(std::ofstream& file) const {
-    file << "\t\"" << this << "\" [label = \"expr node\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+    file << "\t\"" << this << "\" [label = \"expr\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
 
     if (expr_node_ != nullptr) {
         file << "\t\"" << this << "\" -> \"" << expr_node_ << "\"" << std::endl;
