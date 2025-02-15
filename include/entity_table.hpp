@@ -11,8 +11,9 @@
 #include <spdlog/fmt/ranges.h>
 
 class EntityTable {
-  private:
+  public:
     using EntityScope = std::unordered_map<std::string, int>;
+  private:
     std::list<EntityScope> scopes_;
 
   public:
@@ -20,8 +21,8 @@ class EntityTable {
         scopes_.emplace_back(); // global scope
     }
     
-    void push_scope() {
-        scopes_.emplace_back();
+    void push_scope(EntityScope scope = EntityScope{}) {
+        scopes_.emplace_back(scope);
         spdlog::trace("add scope on top");
     }
 
@@ -32,6 +33,11 @@ class EntityTable {
             throw std::runtime_error("Cannot pop global scope");
         }
         spdlog::trace("remove scope from top");
+    }
+
+    EntityScope top_scope() {
+        spdlog::trace("obtain top scope");
+        return scopes_.back();
     }
 
     // checks is variable declared at all
