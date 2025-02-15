@@ -73,25 +73,30 @@ parser::token_type yylex(parser::semantic_type* yylval,
 %left MUL DIV
 %nonassoc EQUAL NOT_EQUAL BELOW GREATER EQUAL_OR_BELOW EQUAL_OR_GREATER
 
-%token <int>                   NUMBER
-%token <std::string>           VAR 
+%nonassoc XIF
+%nonassoc ELSE
 
-%nterm <ast::TreeNode*>        program
-%nterm <ast::TreeNode*>        while_stmt
-%nterm <ast::TreeNode*>        if_stmt
-%nterm <ast::TreeNode*>        else
-%nterm <ast::TreeNode*>        expr 
-%nterm <ast::TreeNode*>        expr_stmt
-%nterm <ast::TreeNode*>        decl
-%nterm <ast::TreeNode*>        var_deref
-%nterm <ast::TreeNode*>        assignment
-%nterm <ast::TreeNode*>        value
-%nterm <ast::TreeNode*>        print
-%nterm <ast::TreeNode*>        stmt
-%nterm <ast::TreeNode*>        stmts
-%nterm <ast::TreeNode*>        scope
-%nterm <ast::TreeNode*>        begin_of_scope
-%nterm <ast::TreeNode*>        end_of_scope
+%token <int>                    NUMBER
+%token <std::string>            VAR 
+
+%nterm <ast::TreeNode*>         program
+%nterm <ast::TreeNode*>         expr 
+%nterm <ast::TreeNode*>         expr_stmt
+%nterm <ast::TreeNode*>         decl
+%nterm <ast::TreeNode*>         var_deref
+%nterm <ast::TreeNode*>         assignment
+%nterm <ast::TreeNode*>         value
+%nterm <ast::TreeNode*>         print
+%nterm <ast::TreeNode*>         if_stmt
+%nterm <ast::TreeNode*>         while_stmt
+%nterm <ast::TreeNode*>         else
+
+%nterm <ast::TreeNode*>         stmt
+%nterm <ast::TreeNode*>         stmts
+%nterm <ast::TreeNode*>         scope
+
+%nterm <ast::TreeNode*>         begin_of_scope
+%nterm <ast::TreeNode*>         end_of_scope
 
 %% 
 
@@ -106,12 +111,10 @@ stmts: stmt stmts
             parse_trace("Reducing: stmts -> stmt stmts"); 
             driver->add_node($1); 
         }
-/*    | stmt
-        { 
-            parse_trace("Reducing: stmts -> stmt"); 
-            driver->add_node($1); 
-        } */
-    | %empty {}
+    | %empty 
+        {
+            parse_trace("Reducing: stmts -> <empty>");
+        }
 ;
 
 scope: begin_of_scope stmts end_of_scope 
@@ -121,7 +124,7 @@ scope: begin_of_scope stmts end_of_scope
         }
 ;
 
-begin_of_scope: LEFT_CURLY_BRACKER  
+begin_of_scope: LEFT_CURLY_BRACKER
         {   
             parse_trace("Reducing: begin_of_scope -> LEFT_CURLY_BRACKER"); 
             driver->current_scope_ = driver->tree.insert_scope_node(driver->current_scope_); 
@@ -138,48 +141,28 @@ end_of_scope: RIGHT_CURLY_BRACKER
 
 stmt: print
         { 
-            parse_trace("Reducing: stmt -> print SEMICOLON"); 
+            parse_trace("Reducing: stmt -> print"); 
             $$ = $1; 
         }
     | if_stmt 
         { 
-            parse_trace("Reducing: stmt -> if"); 
+            parse_trace("Reducing: stmt -> if_stmt"); 
             $$ = $1; 
         }
     | while_stmt 
         {  
-            parse_trace("Reducing: stmt -> while"); 
+            parse_trace("Reducing: stmt -> while_stmt"); 
             $$ = $1; 
         }
-    /*| assignment SEMICOLON
+    | expr_stmt
         { 
-            parse_trace("Reducing: stmt -> assignment SEMICOLON"); 
-            $$ = $1; 
-        }*/
-    | expr_stmt /*SEMICOLON */
-        { 
-            parse_trace("Reducing: stmt -> comp_expr SEMICOLON"); 
+            parse_trace("Reducing: stmt -> comp_expr"); 
             $$ = $1; 
         }
     | scope 
         { 
             parse_trace("Reducing: stmt -> scope"); 
             $$ = $1; 
-        }
-;
-
-
-assignment: decl ASSIGNMENT expr
-        { 
-            parse_trace("Reducing: assignment -> decl ASSIGNMENT expr"); 
-            $$ = driver->tree.insert_assignment_node($1, $3); 
-        }
-;
-
-print: PRINT expr SEMICOLON /* // FIXME ? */
-        {
-            parse_trace("Reducing: print -> PRINT comp_expr"); 
-            $$ = driver->tree.insert_print_node($2); 
         }
 ;
 
@@ -195,9 +178,9 @@ else: ELSE stmt
             parse_trace("Reducing: else -> ELSE stmt"); 
             $$ = driver->tree.insert_else_node($2); 
         }
-    | %empty
+    | %prec XIF %empty
         { 
-            parse_trace("Reducing: else -> <empty>"); 
+            parse_trace("Reducing: else -> <prec> XIF <empty>"); 
             $$ = nullptr; 
         }
 ;
@@ -206,6 +189,13 @@ while_stmt: WHILE LEFT_ROUND_BRACKER expr RIGHT_ROUND_BRACKER stmt
         { 
             parse_trace("Reducing: while -> WHILE LEFT_ROUND_BRACKER comp_expr RIGHT_ROUND_BRACKER stmt"); 
             $$ = driver->tree.insert_while_node($3, $5); 
+        }
+;
+
+print: PRINT expr SEMICOLON 
+        {
+            parse_trace("Reducing: print -> PRINT comp_expr SEMICOLON"); 
+            $$ = driver->tree.insert_print_node($2); 
         }
 ;
 
@@ -292,8 +282,15 @@ expr: expr PLUS expr
         }
     | INPUT
         {
-            parse_trace("Reducing: expr -> input"); 
+            parse_trace("Reducing: expr -> INPUT"); 
             $$ = driver->tree.insert_question_mark_node();
+        }
+;
+
+assignment: decl ASSIGNMENT expr
+        { 
+            parse_trace("Reducing: assignment -> decl ASSIGNMENT expr"); 
+            $$ = driver->tree.insert_assignment_node($1, $3); 
         }
 ;
 
