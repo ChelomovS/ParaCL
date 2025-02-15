@@ -1,0 +1,40 @@
+level1 = 10;
+level2 = 20;
+level3 = 30;
+level4 = 40;
+
+if (level1 < level2) {
+    print 111; // printed 111
+    if (level2 < level3) {
+        print 222; // printed 222
+        if (level3 < level4) {
+            print 333; // printed 333
+            if (level4 == 40) {
+                print 444; // printed 444
+            } else {
+                print 400; // not printed
+            }
+        } else {
+            print 300; // not printed
+            if (level3 > 25) {
+                print 350; // not printed
+            } else {
+                print 325; // not printed
+            }
+        }
+    } else {
+        print 200; // not printed
+        if (level2 != 15) {
+            print 250; // not printed
+        } else {
+            print 210; // not printed
+        }
+    }
+} else {
+    print 100; // not printed
+    if (level1 >= 5) {
+        print 150; // not printed
+    } else {
+        print 105; // not printed
+    }
+}
