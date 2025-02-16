@@ -7,7 +7,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install GTest and G++
+    - name: install deps
       run: |
           sudo apt-get install -y libgtest-dev cmake g++ flex bison libfl-dev
 

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.13)
 
 project(gtest)
 
@@ -22,5 +22,4 @@ enable_testing()
 target_link_libraries(unit_tests PRIVATE spdlog)
 target_link_libraries(unit_tests PRIVATE  ${GTEST_BOTH_LIBRARIES})
 target_compile_features(unit_tests PRIVATE cxx_std_20)
-
 add_test(NAME unit_tests COMMAND unit_tests)
