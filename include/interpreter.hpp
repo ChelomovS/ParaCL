@@ -16,7 +16,7 @@ class Interpreter final : public ast::NodeVisitor {
     EntityTable entity_table;
     std::vector<int> eval_stack;
   public:
-    Interpreter(ast::Ast ast) : ast_{ast} {}
+    Interpreter(ast::Ast ast) : ast_{std::move(ast)} {}
 
     void visit_all() override;
     void visit(const ast::WhileNode& node) override;

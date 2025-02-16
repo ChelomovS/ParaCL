@@ -21,14 +21,14 @@ protected:
     }
 
     void RunAndCheckOutput(const std::string& expected_output) {
-        intpr::Interpreter interpreter(ast_);
+        intpr::Interpreter interpreter(std::move(ast_));
         interpreter.visit_all();
         EXPECT_EQ(buffer_->str(), expected_output);
     }
 
     template <typename ExpectedException>
     void RunAndCheckForThrow() {
-        intpr::Interpreter interpreter(ast_);
+        intpr::Interpreter interpreter(std::move(ast_));
         EXPECT_THROW({interpreter.visit_all();}, ExpectedException);
     }
 

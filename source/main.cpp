@@ -16,8 +16,8 @@ int main(const int argc, const char* argv[]) {
 #if defined (NDEBUG)
     spdlog::set_level(spdlog::level::info);
 #else // NDEBUG
-    spdlog::flush_on(spdlog::level::trace);
-    spdlog::set_level(spdlog::level::trace);
+    // spdlog::flush_on(spdlog::level::trace);
+    spdlog::set_level(spdlog::level::debug);
 #endif // NDEBUG
 
     // log argv
@@ -55,8 +55,14 @@ int main(const int argc, const char* argv[]) {
     #endif 
 
     if (no_errors) {
-        intpr::Interpreter interpreter(driver.tree);
+        intpr::Interpreter interpreter(std::move(driver.tree));
+        try {
         interpreter.visit_all();
+        } catch (const std::runtime_error& e) {
+            std::cerr << e.what() << std::endl;
+        } catch (...) {
+            std::cerr << "Unexpected error" << std::endl;
+        }
         spdlog::info("interpreter completed");
     }
 

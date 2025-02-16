@@ -14,10 +14,12 @@ class Driver {
 
   public:
     ast::Ast tree;
-    ast::ScopeNode* current_scope_;
+    ast::ScopeNode* current_scope_ = nullptr;
 
-    Driver(FlexLexer* plex) : plex_{plex}, current_scope_{tree.insert_scope_node(nullptr)} {tree.root_ = current_scope_;};
-    
+    Driver(FlexLexer* plex) : plex_{plex} {
+        current_scope_ = tree.insert_scope_node(nullptr);
+        tree.root_ = current_scope_;
+    }
     parser::token_type yylex(parser::semantic_type* yylval, location* yyloc) {
         parser::token_type tt = static_cast<parser::token_type>(plex_->yylex());
         
