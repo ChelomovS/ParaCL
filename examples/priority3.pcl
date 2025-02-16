@@ -1,0 +1,5 @@
+if (5 * 2 + 3 > 12) {
+    print 1; // 1 printed
+} else {
+    print 0;
+} 

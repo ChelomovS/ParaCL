@@ -69,9 +69,9 @@ parser::token_type yylex(parser::semantic_type* yylval,
 ;
 
 %right ASSIGNMENT
+%nonassoc EQUAL NOT_EQUAL BELOW GREATER EQUAL_OR_BELOW EQUAL_OR_GREATER
 %left PLUS MINUS
 %left MUL DIV
-%nonassoc EQUAL NOT_EQUAL BELOW GREATER EQUAL_OR_BELOW EQUAL_OR_GREATER
 
 %nonassoc XIF
 %nonassoc ELSE

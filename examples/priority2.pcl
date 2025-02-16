@@ -1,0 +1,11 @@
+n = 10;
+sum = 0;
+i = 1;
+
+while (i <= n) {
+    is_even = (i / 2) * 2 == i;
+    sum = sum + i * is_even;
+    i = i + 1;
+}
+
+print sum; // 30 printed
