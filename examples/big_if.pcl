@@ -4,12 +4,3 @@ if (1)
     else 
         print 1;
 
-// printed 1
-// should be that same as: 
-// if (1) {
-//     if (0) {
-//         print 2;
-//     } else {
-//         print 1;
-//     }
-// }

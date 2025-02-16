@@ -252,8 +252,8 @@ class ScopeNode final : public TreeNode {
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
     void print(std::ofstream& file) const override;
 
-    const TreeNode* get_parent_scope() const { return parent_node_; } // NOTE ?????
-    const std::deque<TreeNode*>* get_nodes() const { return &nodes_; } // REVIEW
+    const TreeNode* get_parent_scope() const { return parent_node_; } 
+    const std::deque<TreeNode*>* get_nodes() const { return &nodes_; }
 
     ScopeNode* add_node(TreeNode* new_node) {
         nodes_.push_front(new_node);

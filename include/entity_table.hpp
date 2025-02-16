@@ -57,8 +57,6 @@ class EntityTable {
     }
 
     void declare(std::string name, int value) {
-        // NOTE maybe throw if variable is declared
-
         assert(!scopes_.empty());
         
         scopes_.back().emplace(std::string(name), value);

@@ -171,7 +171,7 @@ void Interpreter::visit(const ast::BinOpNode& node) {
             res = left_op * right_op;
             break;
         case kDiv:
-            if (right_op == 0) { // FIXME
+            if (right_op == 0) {
                 throw std::runtime_error("division by 0");
             }
             
