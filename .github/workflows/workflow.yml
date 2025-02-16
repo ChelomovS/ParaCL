@@ -19,11 +19,13 @@ jobs:
     - name: cmake release build  
       run: |
         cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
-        cmake --build build/release
+        cmake --build build/release --parallel
         cd build/release
+        ctest --output-on-failure
 
     - name: cmake debug build  
       run: |
         cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug
-        cmake --build build/debug
+        cmake --build build/debug --parallel
         cd build/debug
+        ctest --output-on-failure
