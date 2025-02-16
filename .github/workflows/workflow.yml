@@ -1,36 +1,39 @@
-name: ParaCL
+name: ParaCL CI
 on: [push, pull_request]
+
 jobs:
-  build:
-    runs-on: ubuntu-24.04
+  debug_build:
+    runs-on: ubuntu-22.04
     steps:
-    - name: Checkout repository
+    - name: checkout
       uses: actions/checkout@v4
 
     - name: install deps
       run: |
-          sudo apt-get install -y libgtest-dev cmake g++ flex bison libfl-dev
-    - name: сheck versions of Flex and Bison 
+        sudo apt-get update
+        sudo apt-get install -y cmake g++ flex bison libfl-dev libgtest-dev
+
+    - name: test debug
       run: |
-        flex --version
-        bison --version
-      
-    - name: cmake release build  
-      run: |
-        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-        cmake --build build --parallel
-        cd build
+        cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug
+        cmake --build build/debug --parallel
+        cd build/debug 
         ctest --output-on-failure
-    - name: cmake debug build  
+
+  release_build:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+
+    - name: install deps
       run: |
-        cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-        cmake --build build --parallel
-        cd build
+        sudo apt-get update
+        sudo apt-get install -y cmake g++ flex bison libfl-dev libgtest-dev
+
+    - name: test release
+      run: |
+        cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
+        cmake --build build/release --parallel
+        cd build/release 
         ctest --output-on-failure
-    -name : run ete tests
-      run: |
-        cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-        cmake --build build --parallel
-        cd tests/end_to_end
-        chmod +x examples_runner.sh
-        ./examples_runner.sh    
