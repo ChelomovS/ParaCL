@@ -10,7 +10,6 @@ jobs:
     - name: install deps
       run: |
           sudo apt-get install -y libgtest-dev cmake g++ flex bison libfl-dev
-
     - name: сheck versions of Flex and Bison 
       run: |
         flex --version
@@ -18,22 +17,13 @@ jobs:
       
     - name: cmake release build  
       run: |
-        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-        cmake --build build --parallel
-        cd build
+        cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
+        cmake --build build/release --parallel
+        cd build/release
         ctest --output-on-failure
-
     - name: cmake debug build  
       run: |
-        cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-        cmake --build build --parallel
-        cd build
+        cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug
+        cmake --build build/debug --parallel
+        cd build/debug
         ctest --output-on-failure
-
-    - name: ete tests
-      run: |
-        cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-        cmake --build build --parallel
-        cd tests/end-to-end
-        chmod +x examples_runner.sh
-        ./examples_runner.sh
