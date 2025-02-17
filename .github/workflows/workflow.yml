@@ -12,11 +12,14 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake g++ flex bison libfl-dev libgtest-dev
-
-    - name: test debug
+    - name: configure
       run: |
         cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug
-        cmake --build build/debug --parallel
+    - name: build
+      run: |
+        cmake --build build/debug
+    - name: test debug
+      run: |
         cd build/debug 
         ctest --output-on-failure
 
@@ -30,10 +33,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake g++ flex bison libfl-dev libgtest-dev
-
-    - name: test release
+    - name: configure
       run: |
         cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
-        cmake --build build/release --parallel
+    - name: build
+      run: |
+        cmake --build build/release
+    - name: test release
+      run: |
         cd build/release 
         ctest --output-on-failure
