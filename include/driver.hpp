@@ -1,6 +1,9 @@
 #ifndef DRIVER_HPP
 #define DRIVER_HPP
 
+#include <string>
+#include <cstdlib>
+
 #include <FlexLexer.h>
 
 #include "grammar.tab.hpp"

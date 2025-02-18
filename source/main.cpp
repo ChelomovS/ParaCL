@@ -1,8 +1,11 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <utility>
+#include <stdexcept>
 
 #include <spdlog/spdlog.h>
+#include <spdlog/common.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
 #include "ast.hpp"

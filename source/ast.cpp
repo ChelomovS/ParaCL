@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <filesystem>
+#include <fstream>
+#include <string>
+#include <cstdlib>
 
 #include <spdlog/spdlog.h>
 
@@ -225,7 +228,7 @@ void Ast::print() const {
     std::string command = "dot " + dot_file.string() + " -Tpng -o " + image_file.string();
 
     spdlog::debug("command for system: {}", command);
-    int sys_res = system(command.c_str());
+    int sys_res = std::system(command.c_str());
     spdlog::debug("system on graphviz: {}", sys_res);
 }
 
