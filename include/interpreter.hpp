@@ -28,6 +28,7 @@ class Interpreter final : public ast::NodeVisitor {
     void visit(const ast::ValueNode& node) override;
     void visit(const ast::PrintNode& node) override;
     void visit(const ast::BinOpNode& node) override;
+    void visit(const ast::UnOpNode& node) override;
     void visit(const ast::LogOpNode& node) override;
     void visit(const ast::QuestionMarkNode& node) override;
     void visit(const ast::ScopeNode& node) override;

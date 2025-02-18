@@ -48,11 +48,10 @@ int main(const int argc, const char* argv[]) {
     bool no_errors = driver.parse();
     spdlog::info("parse completed: {}", no_errors);
 
-    #define GRAPHVIZ 1
-    #if GRAPHVIZ
+#if defined (GRAPHVIZ)
     driver.tree.print();
     spdlog::debug("graphviz dumped");
-    #endif 
+#endif 
 
     if (no_errors) {
         intpr::Interpreter interpreter(std::move(driver.tree));

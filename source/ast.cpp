@@ -98,6 +98,9 @@ void BinOpNode::print(std::ofstream& file) const {
         case BinaryOpType::kDiv:
             file << "\t\"" << this << "\" [label = \"/\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
             break;
+        case BinaryOpType::kModulus:
+            file << "\t\"" << this << "\" [label = \"%\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            break;
     }
 
     if (left_operand_) {
@@ -108,6 +111,26 @@ void BinOpNode::print(std::ofstream& file) const {
     if (right_operand_) {
         file << "\t\"" << this << "\" -> \"" << right_operand_ << "\"" << std::endl;
         right_operand_->print(file);
+    }
+}
+
+void UnOpNode::print(std::ofstream& file) const {
+    switch (un_op_) {
+        case UnaryOpType::kNot:
+            file << "\t\"" << this << "\" [label = \"!\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            break;
+        case UnaryOpType::kMinus:
+            file << "\t\"" << this << "\" [label = \"-\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            break;
+        case UnaryOpType::kPlus:
+            file << "\t\"" << this << "\" [label = \"+\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            break;
+        
+    }
+
+    if (operand_) {
+        file << "\t\"" << this << "\" -> \"" << operand_ << "\"" << std::endl;
+        operand_->print(file);
     }
 }
 
@@ -130,6 +153,15 @@ void LogOpNode::print(std::ofstream& file) const {
             break;
         case LogicalOpType::kEqualOrGreater:
             file << "\t\"" << this << "\" [label = \">=\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            break;
+        case LogicalOpType::kAnd:
+            file << "\t\"" << this << "\" [label = \"&&\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            break;
+        case LogicalOpType::kOr:
+            file << "\t\"" << this << "\" [label = \"||\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
+            break;
+        case LogicalOpType::kXor:
+            file << "\t\"" << this << "\" [label = \"^\", shape = \"box\", style = \"filled\", fillcolor = \"#1f77b4\"]";
             break;
     }
 

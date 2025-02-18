@@ -15,6 +15,7 @@ class AssignmentNode;
 class ValueNode;
 class PrintNode;
 class BinOpNode;
+class UnOpNode;
 class LogOpNode;
 class QuestionMarkNode;
 class ScopeNode;
@@ -34,6 +35,7 @@ class NodeVisitor {
     virtual void visit(const ValueNode& node) = 0;
     virtual void visit(const PrintNode& node) = 0;
     virtual void visit(const BinOpNode& node) = 0;
+    virtual void visit(const UnOpNode& node)  = 0;
     virtual void visit(const LogOpNode& node) = 0;
     virtual void visit(const QuestionMarkNode& node) = 0;
     virtual void visit(const ScopeNode& node) = 0;

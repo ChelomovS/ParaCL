@@ -52,6 +52,7 @@ parser::token_type yylex(parser::semantic_type* yylval,
     MINUS               "-"
     DIV                 "/"
     MUL                 "*"
+    MODULUS             "%"
     ASSIGNMENT          "="
     INPUT               "?"
     NOT_EQUAL           "!="
@@ -60,6 +61,10 @@ parser::token_type yylex(parser::semantic_type* yylval,
     EQUAL_OR_BELOW      "<="
     GREATER             ">"
     EQUAL_OR_GREATER    ">="
+    NOT                 "!"
+    AND                 "&&"
+    OR                  "||"
+    XOR                 "^"
     SEMICOLON           ";"
     IF                  "if"
     ELSE                "else"
@@ -70,9 +75,12 @@ parser::token_type yylex(parser::semantic_type* yylval,
 
 %right ASSIGNMENT
 %nonassoc EQUAL NOT_EQUAL BELOW GREATER EQUAL_OR_BELOW EQUAL_OR_GREATER
+%left XOR
+%left OR
+%left AND
 %left PLUS MINUS
-%left MUL DIV
-
+%left MUL DIV MODULUS
+%nonassoc UMINUS NOT
 %nonassoc XIF
 %nonassoc ELSE
 
@@ -230,6 +238,26 @@ expr: expr PLUS expr
             parse_trace("Reducing: expr -> expr DIV expr"); 
             $$ = driver->tree.insert_bin_op_node(ast::BinaryOpType::kDiv, $1, $3); 
         }
+    | expr MODULUS expr
+        {
+            parse_trace("Reducing: expr -> expr MODULUS expr"); 
+            $$ = driver->tree.insert_bin_op_node(ast::BinaryOpType::kModulus, $1, $3); 
+        }
+    | NOT expr  
+        {
+            parse_trace("Reducing: expr -> NOT expr"); 
+            $$ = driver->tree.insert_un_op_node(ast::UnaryOpType::kNot, $2);
+        }
+    | MINUS expr  
+        {
+            parse_trace("Reducing: expr -> MINUS expr"); 
+            $$ = driver->tree.insert_un_op_node(ast::UnaryOpType::kMinus, $2);
+        }
+    | PLUS expr 
+        {
+            parse_trace("Reducing: expr -> PLUS expr"); 
+            $$ = driver->tree.insert_un_op_node(ast::UnaryOpType::kPlus, $2);
+        }
     | LEFT_ROUND_BRACKER expr RIGHT_ROUND_BRACKER 
         { 
             parse_trace("Reducing: expr -> LEFT_ROUND_BRACKER expr RIGHT_ROUND_BRACKER"); 
@@ -264,6 +292,21 @@ expr: expr PLUS expr
         { 
             parse_trace("Reducing: expr -> expr EQUAL_OR_GREATER expr"); 
             $$ = driver->tree.insert_log_op_node(ast::LogicalOpType::kEqualOrGreater, $1, $3); 
+        }
+    | expr AND expr 
+        { 
+            parse_trace("Reducing: expr -> expr AND expr"); 
+            $$ = driver->tree.insert_log_op_node(ast::LogicalOpType::kAnd, $1, $3); 
+        }   
+    | expr OR expr 
+        { 
+            parse_trace("Reducing: expr -> expr OR expr"); 
+            $$ = driver->tree.insert_log_op_node(ast::LogicalOpType::kOr, $1, $3); 
+        }
+    | expr XOR expr 
+        { 
+            parse_trace("Reducing: expr -> expr XOR expr"); 
+            $$ = driver->tree.insert_log_op_node(ast::LogicalOpType::kXor, $1, $3); 
         }
     | assignment
         {

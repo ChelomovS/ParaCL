@@ -1,0 +1,17 @@
+a = 0;
+b = 1;
+c = 1;
+
+if (a && b)
+    print 1; // nothing 
+
+if (a && b) {
+    print 2; // nothing 
+}
+
+if (b && c)
+    print 3; // 3 printed
+
+if (b && c) {
+    print 4; // 4 printed
+}

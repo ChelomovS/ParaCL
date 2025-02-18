@@ -1,0 +1,6 @@
+print 2 + 2 * 2;    // 6 printed 
+print (2 + 2) * 2;  // 8 printed 
+print 2 * (-2 + 2); // 0 printed 
+print 2 * (2 - 2);  // 0 printed
+print 2 + -2 * -2;  // 6 printed
+print 2 * -2 + 2;   // -2 printed

@@ -174,8 +174,13 @@ void Interpreter::visit(const ast::BinOpNode& node) {
             if (right_op == 0) {
                 throw std::runtime_error("division by 0");
             }
-            
             res = left_op / right_op;
+            break;
+        case kModulus: 
+            if (right_op == 0) {
+                throw std::runtime_error("division by 0"); // ?
+            }
+            res = left_op % right_op;
             break;
         default:
             spdlog::critical("unknown binary operation");
@@ -183,6 +188,12 @@ void Interpreter::visit(const ast::BinOpNode& node) {
     }
 
     eval_stack.push_back(res);
+}
+
+
+void Interpreter::visit(const ast::UnOpNode& node) {
+    trace_calls();
+    // TODO -
 }
 
 void Interpreter::visit(const ast::LogOpNode& node) {

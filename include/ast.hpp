@@ -20,9 +20,10 @@ enum class TreeNodeType {
     kValueNode        = 6,
     kPrintNode        = 7,
     kBinOpNode        = 8,
-    kQuestionMarkNode = 9,
-    kScopeNode        = 10,
-    kExprNode         = 11,
+    kUnOpNode         = 9,
+    kQuestionMarkNode = 10,
+    kScopeNode        = 11,
+    kExprNode         = 12,
 };
 
 class WhileNode;
@@ -34,10 +35,11 @@ class AssignmentNode;
 class ValueNode;
 class PrintNode;
 class BinOpNode;
+class UnOpNode;
 class LogOpNode;
-class QuestionMarkNode;
 class ScopeNode;
 class ExprNode;
+class ExclamationMarkNode;
 
 class TreeNode {
   private:
@@ -175,10 +177,11 @@ class PrintNode final : public TreeNode {
 };
 
 enum class BinaryOpType {
-    kAdd = 0,
-    kSub = 1,
-    kMul = 2,
-    kDiv = 3,
+    kAdd     = 0,
+    kSub     = 1,
+    kMul     = 2,
+    kDiv     = 3,
+    kModulus = 4,
 };
 
 class BinOpNode final : public TreeNode {
@@ -199,6 +202,28 @@ class BinOpNode final : public TreeNode {
     const TreeNode* get_right_op() const { return right_operand_; }
 };
 
+enum class UnaryOpType {
+    kNot   = 0,
+    kMinus = 1,
+    kPlus  = 2,
+};
+
+class UnOpNode final : public TreeNode {
+  private:
+    UnaryOpType un_op_;
+    TreeNode* operand_;
+  public:
+    UnOpNode(UnaryOpType un_op, TreeNode* operand = nullptr)
+        : TreeNode{TreeNodeType::kUnOpNode}, un_op_{un_op}, operand_{operand} {}
+    virtual ~UnOpNode() override = default;
+
+    void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
+    void print(std::ofstream& file) const override;
+
+    UnaryOpType get_bin_op() const { return un_op_; }
+    const TreeNode* get_left_op() const { return operand_; }
+};
+
 enum class LogicalOpType {
     kEqual          = 0,
     kNotEqual       = 1,
@@ -206,6 +231,9 @@ enum class LogicalOpType {
     kEqualOrBelow   = 3,
     kGreater        = 4,
     kEqualOrGreater = 5,
+    kAnd            = 6,
+    kOr             = 7,
+    kXor            = 8,
 };
 
 class LogOpNode final : public TreeNode {
@@ -278,7 +306,6 @@ class ExprNode final : public TreeNode {
 
     const TreeNode* get_expr() const { return expr_node_; }
 };
-
 
 class Ast final {
   public:
@@ -368,6 +395,13 @@ class Ast final {
         nodes_.push_back(new_bin_op_node);
         return static_cast<BinOpNode*>(nodes_.back());
     }
+
+    UnOpNode* insert_un_op_node(UnaryOpType bin_op, TreeNode* operand = nullptr) {
+        UnOpNode* new_bin_op_node = new UnOpNode{bin_op, operand};
+        nodes_.push_back(new_bin_op_node);
+        return static_cast<UnOpNode*>(nodes_.back());
+    }
+ 
 
     LogOpNode* insert_log_op_node(LogicalOpType log_op, TreeNode* left_operand = nullptr, TreeNode* right_operand = nullptr) {
         LogOpNode* new_log_op_node = new LogOpNode{log_op, left_operand, right_operand};

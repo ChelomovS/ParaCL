@@ -9,6 +9,13 @@ find_package(GTest REQUIRED)
 
 enable_testing()
 
+if (GRAPHVIZ)
+    add_definitions(-DGRAPHVIZ=1)
+    message(STATUS "GRAPHVIZ enabled")
+else()
+    message(STATUS "GRAPHVIZ disabled")
+endif()
+
 set(GRAMMAR "parser.y" CACHE STRING "file with grammar" FORCE)
 
 flex_target(scanner

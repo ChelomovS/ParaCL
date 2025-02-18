@@ -1,0 +1,7 @@
+a = 1;
+b = 0;
+
+if (a || b && b)
+    print 1; // 1 printed 
+if (a && b && a) 
+    print 2; // nothing

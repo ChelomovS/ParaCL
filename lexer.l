@@ -12,7 +12,7 @@
 %}
 
 WS             [ \t\n\v]+
-NUMBER         [0-9]+
+NUMBER         -?[0-9]+
 VAR            [a-zA-Z_][a-zA-Z_0-9]*
 
 %%
@@ -28,6 +28,7 @@ VAR            [a-zA-Z_][a-zA-Z_0-9]*
 "-"                 return yy::parser::token_type::MINUS; 
 "/"                 return yy::parser::token_type::DIV; 
 "*"                 return yy::parser::token_type::MUL; 
+"%"                 return yy::parser::token_type::MODULUS;
 "="                 return yy::parser::token_type::ASSIGNMENT;
 "?"                 return yy::parser::token_type::INPUT;
 "!="                return yy::parser::token_type::NOT_EQUAL;
@@ -36,6 +37,10 @@ VAR            [a-zA-Z_][a-zA-Z_0-9]*
 "<="                return yy::parser::token_type::EQUAL_OR_BELOW; 
 ">"                 return yy::parser::token_type::GREATER; 
 ">="                return yy::parser::token_type::EQUAL_OR_GREATER; 
+"!"                 return yy::parser::token_type::NOT;
+"&&"                return yy::parser::token_type::AND;
+"||"                return yy::parser::token_type::OR;
+"^"                 return yy::parser::token_type::XOR;
 ";"                 return yy::parser::token_type::SEMICOLON; 
 "if"                return yy::parser::token_type::IF; 
 "else"              return yy::parser::token_type::ELSE; 
