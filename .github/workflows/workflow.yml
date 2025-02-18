@@ -11,13 +11,13 @@ jobs:
     - name: install deps
       run: |
         sudo apt-get update
-        sudo apt-get install -y cmake g++ flex bison libfl-dev libgtest-dev
+        sudo apt-get install -y cmake g++ flex bison libfl-dev libgtest-dev ninja-build
     - name: configure
       run: |
-        cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug
+        cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug -G Ninja
     - name: build
       run: |
-        cmake --build build/debug
+        cmake --build build/debug --parallel `nproc`
     - name: test debug
       run: |
         cd build/debug 
@@ -32,13 +32,13 @@ jobs:
     - name: install deps
       run: |
         sudo apt-get update
-        sudo apt-get install -y cmake g++ flex bison libfl-dev libgtest-dev
+        sudo apt-get install -y cmake g++ flex bison libfl-dev libgtest-dev ninja-build
     - name: configure
       run: |
-        cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
+        cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release -G Ninja
     - name: build
       run: |
-        cmake --build build/release
+        cmake --build build/release --parallel `nproc`
     - name: test release
       run: |
         cd build/release 
