@@ -20,7 +20,7 @@ cmake --build build
 
 Для генерации изображения AST:
 ```sh
-cmake -DGRAPHVIZ=1 -B build
+cmake -B build -DANALYSE=ON
 ```
 
 ## Использование 
