@@ -1,12 +1,16 @@
 #include "interpreter.hpp"
 
+#include <iostream>
 #include <ostream>
 #include <stdexcept>
 #include <vector>
+#include <string>
+#include <cassert>
 
 #include <spdlog/spdlog.h>
 
 #include "ast.hpp"
+#include "entity_table.hpp"
 
 namespace intpr {
 
@@ -28,12 +32,12 @@ void Interpreter::visit(const ast::WhileNode& node) {
     const ast::TreeNode* cond_node = node.get_cond(); 
     const ast::TreeNode* scope_node = node.get_scope();
 
-    EntityTable::EntityScope scope = EntityTable::EntityScope{};
+    EntityTable<IntprInt>::EntityScope scope = EntityTable<IntprInt>::EntityScope{};
 
     while (true) {
         cond_node->accept(this);
     
-        int expr_value = eval_stack.back();
+        IntprInt expr_value = eval_stack.back();
         eval_stack.pop_back();
         if (!expr_value) { break; }
 
@@ -52,7 +56,7 @@ void Interpreter::visit(const ast::IfNode& node) {
     const ast::TreeNode* else_node = node.get_else();
 
     cond_node->accept(this);
-    int cond_value = eval_stack.back();
+    IntprInt cond_value = eval_stack.back();
     eval_stack.pop_back();
         
     entity_table.push_scope();
@@ -88,7 +92,7 @@ void Interpreter::visit(const ast::VarDerefNode& node) {
     std::string var_name = node.get_name();
 
     if (entity_table.is_declared_global(var_name)) {
-        int var_value = entity_table.lookup(var_name);
+        IntprInt var_value = entity_table.lookup(var_name);
         eval_stack.push_back(var_value);
     } else {
         spdlog::error("undecalred variable");
@@ -103,7 +107,7 @@ void Interpreter::visit(const ast::AssignmentNode& node) {
     const ast::TreeNode* expr_node = node.get_expr();
 
     expr_node->accept(this);
-    int expr_value = eval_stack.back();
+    IntprInt expr_value = eval_stack.back();
     // dont pop because c = b = a = expr; chain assignment
 
     std::string var_name = decl_node->get_name();
@@ -131,7 +135,7 @@ void Interpreter::visit(const ast::PrintNode& node) {
     const ast::TreeNode* expr_node = node.get_to_print();
     expr_node->accept(this);
 
-    int value_to_print = eval_stack.back();
+    IntprInt value_to_print = eval_stack.back();
     eval_stack.pop_back();
 
 #if 0
@@ -151,14 +155,14 @@ void Interpreter::visit(const ast::BinOpNode& node) {
     ast::BinaryOpType bin_op = node.get_bin_op();
 
     left_node->accept(this);
-    int left_op = eval_stack.back();    
+    IntprInt left_op = eval_stack.back();    
     eval_stack.pop_back();
 
     right_node->accept(this);
-    int right_op = eval_stack.back();
+    IntprInt right_op = eval_stack.back();
     eval_stack.pop_back();
 
-    int res = 0;
+    IntprInt res = 0;
     switch (bin_op) {
         using enum ast::BinaryOpType;
         case kAdd:
@@ -183,7 +187,7 @@ void Interpreter::visit(const ast::BinOpNode& node) {
             res = left_op % right_op;
             break;
         default:
-            spdlog::critical("unknown binary operation");
+            spdlog::critical("unknown binary operation: {}", static_cast<int>(bin_op));
             assert(0 && "unknown binary operation");
     }
 
@@ -198,11 +202,11 @@ void Interpreter::visit(const ast::UnOpNode& node) {
     ast::UnaryOpType unary_op = node.get_unary_op();
 
     operand->accept(this);
-    int value = eval_stack.back();
+    IntprInt value = eval_stack.back();
     eval_stack.pop_back();
 
     spdlog::trace("operand value: {}", value);
-    int res = 0;
+    IntprInt res = 0;
     switch (unary_op) {
         using enum ast::UnaryOpType;
         case kNot:
@@ -233,15 +237,15 @@ void Interpreter::visit(const ast::LogOpNode& node) {
     ast::LogicalOpType logical_op = node.get_logical_op();
 
     left_node->accept(this);
-    int left_op = eval_stack.back();    
+    IntprInt left_op = eval_stack.back();    
     eval_stack.pop_back();
 
     right_node->accept(this);
-    int right_op = eval_stack.back();
+    IntprInt right_op = eval_stack.back();
     eval_stack.pop_back();
 
     spdlog::trace("left value: {}, right value: {}", left_op, right_op);
-    int res = false;
+    IntprInt res = false;
     switch (logical_op) {
         using enum ast::LogicalOpType;
         case kEqual:
@@ -293,7 +297,8 @@ void Interpreter::visit(const ast::QuestionMarkNode& node) {
     
     (void)node;
 
-    int input_value = 0;
+    IntprInt input_value = 0;
+
 #if 0
     std::string helper = "Input: ";
 #else 
@@ -308,8 +313,6 @@ void Interpreter::visit(const ast::QuestionMarkNode& node) {
 void Interpreter::visit(const ast::ScopeNode& node) {
     trace_calls();
 
-    // entity_table.push_scope(); // push new scope on top
-
     auto nodes = node.get_nodes();
     for (auto it: *nodes) {
         if (!it) {
@@ -318,8 +321,6 @@ void Interpreter::visit(const ast::ScopeNode& node) {
 
         it->accept(this);
     }
-
-    // entity_table.pop_scope(); // pop scope from top
 }
 
 void Interpreter::visit(const ast::ExprNode& node) {

@@ -10,9 +10,10 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ranges.h>
 
+template <typename ValueT>
 class EntityTable {
   public:
-    using EntityScope = std::unordered_map<std::string, int>;
+    using EntityScope = std::unordered_map<std::string, ValueT>;
   private:
     std::list<EntityScope> scopes_;
 

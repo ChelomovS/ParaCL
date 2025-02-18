@@ -2,6 +2,8 @@
 #define INTERPRETER_HPP
 
 #include <vector>
+#include <utility>
+
 #include <FlexLexer.h>
 
 #include "ast.hpp"
@@ -10,11 +12,13 @@
 
 namespace intpr {
 
+using IntprInt = int;
+
 class Interpreter final : public ast::NodeVisitor {
   private:
     ast::Ast ast_;
-    EntityTable entity_table;
-    std::vector<int> eval_stack;
+    EntityTable<IntprInt> entity_table;
+    std::vector<IntprInt> eval_stack;
   public:
     Interpreter(ast::Ast ast) : ast_{std::move(ast)} {}
 
