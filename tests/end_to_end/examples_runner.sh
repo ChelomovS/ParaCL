@@ -6,6 +6,23 @@ NC='\033[0m'
 
 PASSED=0
 FAILED=0
+VERBOSE=0 # Initialize verbosity flag to 0 (off)
+
+# Process command-line options
+while getopts "v" opt; do
+  case "$opt" in
+    v)
+      VERBOSE=1 # Set verbosity flag to 1 (on) if -v is passed
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG"
+      echo "Usage: $0 [-v]"
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND-1)) # Remove parsed options from positional parameters
+
 
 PARACL_PATHS=(
     "./../../build/ParaCL"
@@ -45,7 +62,7 @@ for TEST_FILE in "$EXAMPLES_DIR"/*; do
     if [ -f "$TEST_FILE" ]; then
         base_name=$(basename "$TEST_FILE")
         expected_file="$ANSWERS_DIR/$base_name.out"
-        
+
         if [ ! -f "$expected_file" ]; then
             echo -e "${RED}Ошибка: эталонный файл $base_name.out не найден${NC}"
             ((FAILED++))
@@ -57,12 +74,19 @@ for TEST_FILE in "$EXAMPLES_DIR"/*; do
 
         if [ $exit_code -ne 0 ]; then
             echo -e "${RED}>>> Провален: $base_name (код ошибки $exit_code)${NC}"
+            if [ $VERBOSE -eq 1 ]; then
+                echo -e "${RED}Код выхода: $exit_code${NC}"
+            fi
             ((FAILED++))
         elif diff -q <(echo "$output") "$expected_file" >/dev/null; then
             echo -e "${GREEN}Пройден: $base_name${NC}"
             ((PASSED++))
         else
             echo -e "${RED}>>> Провален: $base_name${NC}"
+            if [ $VERBOSE -eq 1 ]; then
+                echo -e "${RED}Отличия:${NC}"
+                diff -y <(echo "$output") "$expected_file"
+            fi
             ((FAILED++))
         fi
     fi

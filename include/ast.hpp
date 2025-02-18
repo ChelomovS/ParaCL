@@ -220,8 +220,8 @@ class UnOpNode final : public TreeNode {
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
     void print(std::ofstream& file) const override;
 
-    UnaryOpType get_bin_op() const { return un_op_; }
-    const TreeNode* get_left_op() const { return operand_; }
+    UnaryOpType get_unary_op() const { return un_op_; }
+    const TreeNode* get_operand() const { return operand_; }
 };
 
 enum class LogicalOpType {
