@@ -1,7 +1,15 @@
 a = 1;
 b = 0;
 
-if (a || b && b)
-    print 1; // 1 printed 
-if (a && b && a) 
-    print 2; // nothing
+if (a && a) {
+    print 0; // 0 printed
+}
+if (b && b) {
+    print 1; // nothing
+}
+if (a || b && a) {
+    print 2; // 2 printed 
+}
+if (a && b && a) {
+    print 3; // nothing
+}

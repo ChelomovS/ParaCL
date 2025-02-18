@@ -193,7 +193,36 @@ void Interpreter::visit(const ast::BinOpNode& node) {
 
 void Interpreter::visit(const ast::UnOpNode& node) {
     trace_calls();
-    // TODO -
+
+    const ast::TreeNode* operand = node.get_operand();
+    ast::UnaryOpType unary_op = node.get_unary_op();
+
+    operand->accept(this);
+    int value = eval_stack.back();
+    eval_stack.pop_back();
+
+    spdlog::trace("operand value: {}", value);
+    int res = 0;
+    switch (unary_op) {
+        using enum ast::UnaryOpType;
+        case kNot:
+            res = !value;
+            spdlog::trace("kNot res = {}", res);
+            break;
+        case kMinus:
+            res = -value;
+            spdlog::trace("kMinus res = {}", res);
+            break;
+        case kPlus:
+            res = +value;
+            spdlog::trace("kPlus res = {}", res);
+            break;
+        default:
+            spdlog::critical("unknown unary operation: {}", static_cast<int>(unary_op));
+            assert(0 && "unkown unary operation");
+    }
+
+    eval_stack.push_back(res);
 }
 
 void Interpreter::visit(const ast::LogOpNode& node) {
@@ -212,7 +241,7 @@ void Interpreter::visit(const ast::LogOpNode& node) {
     eval_stack.pop_back();
 
     spdlog::trace("left value: {}, right value: {}", left_op, right_op);
-    int res = 0;
+    int res = false;
     switch (logical_op) {
         using enum ast::LogicalOpType;
         case kEqual:
@@ -239,8 +268,20 @@ void Interpreter::visit(const ast::LogOpNode& node) {
             res = (left_op >= right_op);
             spdlog::trace("kEqualOrGreater res = {}", res);
             break;
+        case kAnd:
+            res = (left_op && right_op);
+            spdlog::trace("kAnd res = {}", res);
+            break;
+        case kOr:
+            res = (left_op || right_op);
+            spdlog::trace("kOr res = {}", res);
+            break;
+        case kXor:
+            res = (left_op ^ right_op);
+            spdlog::trace("kXor res = {}", res);
+            break;
         default:
-            spdlog::critical("unknown logical operation");
+            spdlog::critical("unknown logical operation: {}", static_cast<int>(logical_op));
             assert(0 && "unknown logical operation");
     }
 
