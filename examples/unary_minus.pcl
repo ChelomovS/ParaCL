@@ -1,0 +1,16 @@
+fst = 0;
+snd = 1;
+iters = 10; // by default ?
+if (!iters) {
+    print 0;
+}
+else {
+    iters = iters - 1; // iters = 3
+    while (iters > 0) { // iters = 3, 2, 1
+        tmp = fst;
+        fst = snd;
+        snd = snd + tmp;
+        iters = iters -1;
+    }
+    print snd; // 55 printed
+}
