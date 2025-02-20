@@ -12,7 +12,7 @@
 %}
 
 WS             [ \t\n\v]+
-NUMBER         -?[0-9]+
+NUMBER         [0-9]+
 VAR            [a-zA-Z_][a-zA-Z_0-9]*
 
 %%

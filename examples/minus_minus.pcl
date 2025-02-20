@@ -1,0 +1,5 @@
+print 1 - -1;
+
+fst = 1;
+snd = 2;
+print fst - -snd;
