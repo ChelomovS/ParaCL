@@ -20,7 +20,7 @@ int main(const int argc, const char* argv[]) {
     spdlog::set_level(spdlog::level::info);
 #else // NDEBUG
     // spdlog::flush_on(spdlog::level::trace);
-    spdlog::set_level(spdlog::level::debug);
+    spdlog::set_level(spdlog::level::trace);
 #endif // NDEBUG
 
     // log argv

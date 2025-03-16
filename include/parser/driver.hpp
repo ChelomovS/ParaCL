@@ -13,10 +13,32 @@
 #include <spdlog/spdlog.h>
 
 #include "grammar.tab.hpp"
+
 #include "location.hh"
 #include "parser/ast.hpp"
 
 namespace yy {
+
+class PclLexer : public yyFlexLexer {
+  private:
+    location cur_loc_{nullptr, 1, 1};
+  public:
+    PclLexer(std::ifstream* in_stream) : yyFlexLexer(in_stream) {}
+    
+    void token() {
+        cur_loc_.step();
+        cur_loc_.columns(yyleng);
+    }
+    void new_line() {
+        cur_loc_.step();
+        cur_loc_.lines(yyleng);
+    }
+    location current_loc() {
+        return cur_loc_;
+    }
+
+    int yylex() override;
+};
 
 class PclLexer : public yyFlexLexer {
   private:
@@ -49,6 +71,7 @@ class Driver {
     ast::ScopeNode* current_scope_ = nullptr;
 
     Driver(PclLexer* plex) : plex_{plex} {
+    Driver(PclLexer* plex) : plex_{plex} {
         current_scope_ = tree.insert_scope_node(nullptr);
         tree.root_ = current_scope_;
     }
@@ -66,6 +89,12 @@ class Driver {
             default:
                 break;
         }
+
+        location current_loc = plex_->current_loc();
+        yyloc->initialize(nullptr, current_loc.begin.line, current_loc.begin.column);
+        spdlog::trace("location: {} {} {} {}", yyloc->begin.line, yyloc->begin.column, yyloc->end.line, yyloc->end.column);
+        spdlog::trace("lenght: {}", plex_->YYLeng());
+        spdlog::trace("text: {}", plex_->YYText());
 
         location current_loc = plex_->current_loc();
         yyloc->initialize(nullptr, current_loc.begin.line, current_loc.begin.column);
