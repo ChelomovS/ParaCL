@@ -2,8 +2,10 @@
 #define DRIVER_HPP
 
 #include <fstream>
+#include <memory>
 #include <string>
 #include <cstdlib>
+#include <utility>
 
 #undef yyFlexLexer
 #include <FlexLexer.h>
@@ -12,7 +14,7 @@
 
 #include "grammar.tab.hpp"
 #include "location.hh"
-#include "ast.hpp"
+#include "parser/ast.hpp"
 
 namespace yy {
 
@@ -39,7 +41,8 @@ class PclLexer : public yyFlexLexer {
 
 class Driver {
   private:
-    PclLexer* plex_;
+    // PclLexer* plex_;
+    std::unique_ptr<PclLexer> plex_;
 
   public:
     ast::Ast tree;

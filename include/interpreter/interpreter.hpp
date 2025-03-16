@@ -6,9 +6,9 @@
 
 #include <FlexLexer.h>
 
-#include "ast.hpp"
-#include "entity_table.hpp"
-#include "node_visitor.hpp"
+#include "parser/ast.hpp"
+#include "parser/node_visitor.hpp"
+#include "interpreter/entity_table.hpp"
 
 namespace intpr {
 

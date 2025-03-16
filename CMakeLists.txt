@@ -1,73 +1,33 @@
-cmake_minimum_required(VERSION 3.13)
-project(ParaCL)
+cmake_minimum_required(VERSION 3.20)
+project(ParaCL CXX)
 
-set(FLEX_INCLUDE_DIR "/usr/include" CACHE PATH "path to flex include dir")
-
-find_package(BISON REQUIRED)
-find_package(FLEX REQUIRED)
-find_package(GTest REQUIRED)
-
-enable_testing()
+include(cmake/defaults.cmake)
+include(cmake/third_party.cmake)
 
 if (GRAPHVIZ)
     add_definitions(-DGRAPHVIZ=1)
-    message(STATUS "GRAPHVIZ enabled")
+    message(STATUS "graphviz enabled")
 else()
-    message(STATUS "GRAPHVIZ disabled")
+    message(STATUS "graphviz disabled")
 endif()
 
-set(GRAMMAR "parser.y" CACHE STRING "file with grammar" FORCE)
+add_subdirectory(source/interpreter)
+add_subdirectory(source/parser)
 
-flex_target(scanner
-    lexer.l
-    ${CMAKE_CURRENT_BINARY_DIR}/lexer.cpp
+add_executable(${PROJECT_NAME})
+
+target_sources(${PROJECT_NAME}
+    PRIVATE
+        source/main.cpp
 )
 
-bison_target(parser
-    ${GRAMMAR}
-    ${CMAKE_CURRENT_BINARY_DIR}/parser.cpp
-    DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/grammar.tab.hpp
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        pcl-defaults
+        pcl-interpreter
+        pcl-parser
+
+        spdlog
 )
-
-add_flex_bison_dependency(scanner parser)
-
-set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
-
-add_executable(${PROJECT_NAME}
-    source/main.cpp
-    source/ast.cpp
-    source/interpreter.cpp
-    ${BISON_parser_OUTPUTS}
-    ${FLEX_scanner_OUTPUTS}
-)
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
-endif()
-
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${INCLUDE_DIR}
-    ${FLEX_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wunused -Wshadow ")
-# set(ASAN_FLAGS "-fsanitize=address,undefined")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g3 -Og -ggdb")
-
-include(cmake/CPM.cmake)
-
-CPMAddPackage(
-    NAME spdlog
-    GITHUB_REPOSITORY gabime/spdlog
-    GIT_TAG v1.15.0
-)
-
-if (spdlog_ADDED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
-endif() 
 
 add_subdirectory(tests)

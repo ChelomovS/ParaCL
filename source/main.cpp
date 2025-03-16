@@ -8,9 +8,9 @@
 #include <spdlog/common.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
-#include "ast.hpp"
-#include "driver.hpp"
-#include "interpreter.hpp"
+#include "parser/ast.hpp"
+#include "parser/driver.hpp"
+#include "interpreter/interpreter.hpp"
 
 int main(const int argc, const char* argv[]) {
     auto logger = spdlog::basic_logger_mt("paracl", "paracl.log", /*override log?*/ true);
@@ -20,7 +20,7 @@ int main(const int argc, const char* argv[]) {
     spdlog::set_level(spdlog::level::info);
 #else // NDEBUG
     // spdlog::flush_on(spdlog::level::trace);
-    spdlog::set_level(spdlog::level::trace);
+    spdlog::set_level(spdlog::level::debug);
 #endif // NDEBUG
 
     // log argv
@@ -56,19 +56,19 @@ int main(const int argc, const char* argv[]) {
     spdlog::debug("graphviz dumped");
 #endif 
 
-    if (no_errors) {
-        intpr::Interpreter interpreter(std::move(driver.tree));
-        try {
-        interpreter.visit_all();
-        } catch (const std::runtime_error& e) {
-            std::cerr << e.what() << std::endl;
-        } catch (...) {
-            std::cerr << "Unexpected error" << std::endl;
-        }
-        spdlog::info("interpreter completed");
+    if (!no_errors) {
+        return EXIT_FAILURE;
     }
 
-    delete lexer;
-    
+    intpr::Interpreter interpreter(std::move(driver.tree));
+    try {
+        interpreter.visit_all();
+    } catch (const std::runtime_error& e) {
+        std::cerr << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "Unexpected error" << std::endl;
+    }
+    spdlog::info("interpreter completed");
+
     return EXIT_SUCCESS;
 }
