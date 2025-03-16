@@ -5,10 +5,10 @@
 
 %define api.value.type variant 
 %define parse.error verbose
+%locations
+%define api.location.file "location.hh"
 
 %param {yy::Driver* driver}
-
-%locations
 
 %code requires 
 {
@@ -23,6 +23,11 @@ namespace yy { class Driver; }
 %code
 {
 #include "driver.hpp"
+
+/*
+#undef YY_DECL
+#define YY_DECL int PclLexer::yylex()
+*/
 
 namespace yy {
 
@@ -371,7 +376,8 @@ parser::token_type yylex(parser::semantic_type* yylval,
 
 void parser::error(const location& loc, const std::string& error) {
     std::cerr << "Error: " << error << std::endl;
-    std::cerr << "\tLine: " << loc.begin.line << std::endl;
+    std::cerr << "\tLocation: " << loc.begin.line << ":" << loc.begin.column << std::endl;
+    /*std::cerr << "\tLocation: " << loc.end.line << ":" << loc.end.column << std::endl;*/
 }
 
 } // namespace yy

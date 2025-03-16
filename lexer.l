@@ -1,23 +1,32 @@
 %option C++
-%option yylineno
+
 %option noyywrap
+%option yylineno
+%option warn 
+%option yyclass="yy::PclLexer"
 
 %{ 
 #include <iostream>
 
 #include "grammar.tab.hpp"
+#include "driver.hpp"
+/*#undef YY_DECL
+#define YY_DECL int PclLexer::yylex()*/
 %}
 
 %{
+#define YY_USER_ACTION token();
 %}
 
-WS             [ \t\n\v]+
-NUMBER         [0-9]+
-VAR            [a-zA-Z_][a-zA-Z_0-9]*
+WS              [ \t\v]+
+NLINE           [\n]+
+NUMBER          [0-9]+
+VAR             [a-zA-Z_][a-zA-Z_0-9]*
 
 %%
 
-{WS}                /* skip blanks and tabs */
+{NLINE}             { new_line(); } 
+{WS}                {}
 "//".*              /* skip comments */
 {NUMBER}            return yy::parser::token_type::NUMBER;
 ")"                 return yy::parser::token_type::RIGHT_ROUND_BRACKER; 
