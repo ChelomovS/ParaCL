@@ -20,7 +20,7 @@ int main(const int argc, const char* argv[]) {
     spdlog::set_level(spdlog::level::info);
 #else // NDEBUG
     // spdlog::flush_on(spdlog::level::trace);
-    spdlog::set_level(spdlog::level::debug);
+    spdlog::set_level(spdlog::level::trace);
 #endif // NDEBUG
 
     // log argv
@@ -46,7 +46,7 @@ int main(const int argc, const char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    FlexLexer *lexer = new yyFlexLexer(&pcl_src_file);
+    yy::PclLexer *lexer = new yy::PclLexer(&pcl_src_file);
     yy::Driver driver(lexer);
     bool no_errors = driver.parse();
     spdlog::info("parse completed: {}", no_errors);
