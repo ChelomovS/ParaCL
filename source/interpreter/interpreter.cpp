@@ -1,4 +1,4 @@
-#include "interpreter.hpp"
+#include "interpreter/interpreter.hpp"
 
 #include <iostream>
 #include <ostream>
@@ -9,8 +9,8 @@
 
 #include <spdlog/spdlog.h>
 
-#include "ast.hpp"
-#include "entity_table.hpp"
+#include "parser/ast.hpp"
+#include "interpreter/entity_table.hpp"
 
 namespace intpr {
 
@@ -36,7 +36,7 @@ void Interpreter::visit(const ast::WhileNode& node) {
 
     while (true) {
         cond_node->accept(this);
-    
+
         IntprInt expr_value = eval_stack.back();
         eval_stack.pop_back();
         if (!expr_value) { break; }

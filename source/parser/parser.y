@@ -15,19 +15,14 @@
 #include <iostream>
 #include <string>
 
-#include "ast.hpp"
+#include "parser/ast.hpp"
 
 namespace yy { class Driver; }
 }
 
 %code
 {
-#include "driver.hpp"
-
-/*
-#undef YY_DECL
-#define YY_DECL int PclLexer::yylex()
-*/
+#include "parser/driver.hpp"
 
 namespace yy {
 
@@ -40,7 +35,7 @@ parser::token_type yylex(parser::semantic_type* yylval,
 }
 
 %{
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 #if 1
 #define parse_trace(...) spdlog::trace(__VA_ARGS__)
 #else
@@ -377,7 +372,6 @@ parser::token_type yylex(parser::semantic_type* yylval,
 void parser::error(const location& loc, const std::string& error) {
     std::cerr << "Error: " << error << std::endl;
     std::cerr << "\tLocation: " << loc.begin.line << ":" << loc.begin.column << std::endl;
-    /*std::cerr << "\tLocation: " << loc.end.line << ":" << loc.end.column << std::endl;*/
 }
 
 } // namespace yy

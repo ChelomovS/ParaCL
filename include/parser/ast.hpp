@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <utility>
 
-#include "node_visitor.hpp"
+#include "parser/node_visitor.hpp"
 
 namespace ast {
 

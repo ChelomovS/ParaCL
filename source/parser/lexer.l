@@ -9,9 +9,7 @@
 #include <iostream>
 
 #include "grammar.tab.hpp"
-#include "driver.hpp"
-/*#undef YY_DECL
-#define YY_DECL int PclLexer::yylex()*/
+#include "parser/driver.hpp"
 %}
 
 %{

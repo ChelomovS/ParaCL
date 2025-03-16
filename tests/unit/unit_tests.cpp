@@ -1,11 +1,16 @@
 #include <stdexcept> // for std::runtime_error
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <utility>
 
 #include <gtest/gtest.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
+#include <spdlog/common.h>
 
-#include "interpreter.hpp"
-#include "ast.hpp"
+#include "interpreter/interpreter.hpp"
+#include "parser/ast.hpp"
 
 class InterpreterTest : public ::testing::Test {
 protected:

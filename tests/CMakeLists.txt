@@ -2,24 +2,27 @@ cmake_minimum_required(VERSION 3.13)
 
 project(gtest)
 
-if(NOT DEFINED INCLUDE_DIR)
-    message(WARNING "INCLUDE_DIR is not defined.")
-endif()
+enable_testing()
 
 find_package(GTest REQUIRED)
 
-aux_source_directory(unit UNIT_TESTS)
+add_executable(unit_tests
+    unit/unit_tests.cpp
+)
 
-add_executable(unit_tests 
-               ../source/ast.cpp
-               ../source/interpreter.cpp 
-               ${UNIT_TESTS})
+target_include_directories(unit_tests 
+    PRIVATE 
+        ${GTEST_INCLUDE_DIRS}
+)
 
-target_include_directories(unit_tests PRIVATE ${INCLUDE_DIR} ${GTEST_INCLUDE_DIRS})
+target_link_libraries(unit_tests 
+    PRIVATE
+        pcl-parser
+        pcl-interpreter
+        pcl-defaults
 
-enable_testing()
+        spdlog
+        ${GTEST_BOTH_LIBRARIES}
+)
 
-target_link_libraries(unit_tests PRIVATE spdlog)
-target_link_libraries(unit_tests PRIVATE  ${GTEST_BOTH_LIBRARIES})
-target_compile_features(unit_tests PRIVATE cxx_std_20)
 add_test(NAME unit_tests COMMAND unit_tests)
