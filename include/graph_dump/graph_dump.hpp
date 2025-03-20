@@ -1,24 +1,29 @@
-#ifndef INTERPRETER_HPP
-#define INTERPRETER_HPP
+#ifndef GRAPH_DUMP_HPP
+#define GRAPH_DUMP_HPP
 
-#include <vector>
-
-#include <FlexLexer.h>
+#include <ostream>
+#include <filesystem>
+#include <memory>
+#include <fstream>
 
 #include "parser/ast.hpp"
 #include "parser/node_visitor.hpp"
-#include "interpreter/entity_table.hpp"
 
-namespace intpr {
+namespace gdump {
 
-using IntprInt = int;
-
-class Interpreter final : public ast::NodeVisitor {
+class GraphDump final : public ast::NodeVisitor {
   private:
-    EntityTable<IntprInt> entity_table;
-    std::vector<IntprInt> eval_stack;
+    std::unique_ptr<std::ostream> dump_file_;
   public:
-    Interpreter(const ast::Ast& ast) : NodeVisitor{ast} {}
+    GraphDump(const ast::Ast& ast) : NodeVisitor{ast}, dump_file_{nullptr} {
+        std::filesystem::path graphviz_dir = "graphviz";
+        if (!std::filesystem::exists(graphviz_dir)) {
+            std::filesystem::create_directory(graphviz_dir);
+        }
+
+        std::filesystem::path dot_file = graphviz_dir / "graph.dot";
+        dump_file_ = std::make_unique<std::ofstream>(dot_file);
+    }
 
     void visit_all() override;
     void visit(const ast::WhileNode& node) override;
@@ -37,6 +42,7 @@ class Interpreter final : public ast::NodeVisitor {
     void visit(const ast::ExprNode& node) override;
 };
 
-} // namespace intpr
+} // namespace gdump
 
-#endif // INTERPRETER_HPP
+#endif // GRAPH_DUMP_HPP
+

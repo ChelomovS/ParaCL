@@ -13,6 +13,7 @@ endif()
 
 add_subdirectory(source/interpreter)
 add_subdirectory(source/parser)
+add_subdirectory(source/graph_dump)
 
 add_executable(${PROJECT_NAME})
 
@@ -26,6 +27,7 @@ target_link_libraries(${PROJECT_NAME}
         pcl-defaults
         pcl-interpreter
         pcl-parser
+        pcl-graphdump
 
         spdlog
 )

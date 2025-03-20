@@ -20,7 +20,6 @@ add_flex_bison_dependency(scanner parser)
 
 add_library(pcl-parser
     STATIC
-        ast.cpp        
         ${BISON_parser_OUTPUTS}
         ${FLEX_scanner_OUTPUTS}
 )

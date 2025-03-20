@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 #include <cstdlib>
-#include <utility>
 
 #undef yyFlexLexer
 #include <FlexLexer.h>
