@@ -6,6 +6,7 @@
 namespace ast {
 
 // forward decl
+class Ast;
 class WhileNode;
 class IfNode;
 class ElseNode;
@@ -23,6 +24,8 @@ class ExprNode;
 
 class NodeVisitor {
   public: 
+    NodeVisitor(const Ast& ast)
+        : ast_{ast} {}
     virtual ~NodeVisitor() = default;
 
     virtual void visit_all() = 0; 
@@ -40,6 +43,8 @@ class NodeVisitor {
     virtual void visit(const QuestionMarkNode& node) = 0;
     virtual void visit(const ScopeNode& node) = 0;
     virtual void visit(const ExprNode& node) = 0;
+  protected:
+    const Ast& ast_;
 };
 
 } // namespace

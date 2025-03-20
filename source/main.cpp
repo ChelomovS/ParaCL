@@ -12,6 +12,10 @@
 #include "parser/driver.hpp"
 #include "interpreter/interpreter.hpp"
 
+#if defined (GRAPHVIZ)
+#include "graph_dump/graph_dump.hpp"
+#endif 
+
 int main(const int argc, const char* argv[]) {
     auto logger = spdlog::basic_logger_mt("paracl", "paracl.log", /*override log?*/ true);
     spdlog::set_default_logger(logger);
@@ -49,10 +53,13 @@ int main(const int argc, const char* argv[]) {
     yy::PclLexer *lexer = new yy::PclLexer(&pcl_src_file);
     yy::Driver driver(lexer);
     bool no_errors = driver.parse();
-    spdlog::info("parse completed: {}", no_errors);
+    spdlog::info("parse completed: {}", no_errors); 
 
+    ast::Ast ast = std::move(driver.tree);
 #if defined (GRAPHVIZ)
-    driver.tree.print();
+    gdump::GraphDump graph_dump{ast};
+    graph_dump.visit_all();
+
     spdlog::debug("graphviz dumped");
 #endif 
 
@@ -60,7 +67,7 @@ int main(const int argc, const char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    intpr::Interpreter interpreter(std::move(driver.tree));
+    intpr::Interpreter interpreter(ast);
     try {
         interpreter.visit_all();
     } catch (const std::runtime_error& e) {

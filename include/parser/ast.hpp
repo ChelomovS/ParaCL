@@ -3,7 +3,6 @@
 
 #include <string>
 #include <deque>
-#include <fstream> 
 #include <vector>
 #include <cstdint>
 #include <utility>
@@ -28,21 +27,6 @@ enum class TreeNodeType {
     kExprNode         = 12,
 };
 
-class WhileNode;
-class IfNode;
-class ElseNode;
-class DeclNode;
-class VarDerefNode;
-class AssignmentNode;
-class ValueNode;
-class PrintNode;
-class BinOpNode;
-class UnOpNode;
-class LogOpNode;
-class ScopeNode;
-class ExprNode;
-class ExclamationMarkNode;
-
 class TreeNode {
   private:
     TreeNodeType node_type_;
@@ -51,7 +35,6 @@ class TreeNode {
     virtual ~TreeNode() = default;
 
     virtual void accept(NodeVisitor* visitor) const = 0;
-    virtual void print(std::ofstream& file) const = 0;
 
     TreeNodeType get_type() const { return node_type_; }
 };
@@ -66,7 +49,6 @@ class WhileNode final : public TreeNode {
     ~WhileNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override; 
     
     const TreeNode* get_cond() const { return condition_node_; }
     const TreeNode* get_scope() const { return scope_node_; }
@@ -83,7 +65,6 @@ class IfNode final : public TreeNode {
     ~IfNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 
     const TreeNode* get_cond() const { return condition_node_; }
     const TreeNode* get_scope() const { return scope_node_; }
@@ -99,7 +80,6 @@ class ElseNode final: public TreeNode {
     ~ElseNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 
     const TreeNode* get_scope() const { return scope_node_; }
  };
@@ -113,7 +93,6 @@ class DeclNode final : public TreeNode {
     ~DeclNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 
     std::string get_name() const { return variable_name_; }
 };
@@ -127,7 +106,6 @@ class VarDerefNode final : public TreeNode {
     ~VarDerefNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 
     std::string get_name() const { return variable_name_; }
 };
@@ -142,7 +120,6 @@ class AssignmentNode final : public TreeNode {
     ~AssignmentNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 
     const TreeNode* get_decl() const { return decl_node_; }
     const TreeNode* get_expr() const { return expr_node_; }
@@ -157,7 +134,6 @@ class ValueNode final : public TreeNode {
     ~ValueNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 
     int64_t get_value() const { return value_; }
 };
@@ -171,7 +147,6 @@ class PrintNode final : public TreeNode {
     ~PrintNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 
     const TreeNode* get_to_print() const { return node_to_print_; }
 };
@@ -195,7 +170,6 @@ class BinOpNode final : public TreeNode {
     ~BinOpNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 
     BinaryOpType get_bin_op() const { return bin_op_; }
     const TreeNode* get_left_op() const { return left_operand_; }
@@ -218,7 +192,6 @@ class UnOpNode final : public TreeNode {
     ~UnOpNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 
     UnaryOpType get_unary_op() const { return un_op_; }
     const TreeNode* get_operand() const { return operand_; }
@@ -247,7 +220,6 @@ class LogOpNode final : public TreeNode {
     ~LogOpNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 
     LogicalOpType get_logical_op() const { return log_op_; }
     const TreeNode* get_left_op() const { return left_operand_; }
@@ -263,7 +235,6 @@ class QuestionMarkNode final : public TreeNode {
     ~QuestionMarkNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 };
 
 class ScopeNode final : public TreeNode {
@@ -277,7 +248,6 @@ class ScopeNode final : public TreeNode {
     ~ScopeNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 
     const TreeNode* get_parent_scope() const { return parent_node_; } 
     const std::deque<TreeNode*>* get_nodes() const { return &nodes_; }
@@ -301,7 +271,6 @@ class ExprNode final : public TreeNode {
     ~ExprNode() override = default;
 
     void accept(NodeVisitor* visitor) const override { visitor->visit(*this); }
-    void print(std::ofstream& file) const override;
 
     const TreeNode* get_expr() const { return expr_node_; }
 };
@@ -338,8 +307,6 @@ class Ast final {
     bool empty() const {
         return nodes_.empty();
     }
-
-    void print() const;
 
     WhileNode* insert_while_node(TreeNode* condition_node = nullptr, TreeNode* scope_node = nullptr) {
         WhileNode* new_while_node = new WhileNode{condition_node, scope_node};

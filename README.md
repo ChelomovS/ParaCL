@@ -6,27 +6,15 @@ git clone git@github.com:ChelomovS/ParaCL.git
 cd ParaCL
 ```
 
-Для сборки release версии:
+## Сборка:
 ```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build [-DGRAPHVIZ=ON]
 cmake --build build
-```
-
-Для сборки debug версии:
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-cmake --build build
-```
-
-Для генерации изображения AST:
-```sh
-cmake -B build -DANALYSE=ON
 ```
 
 ## Использование 
 ```sh
-cd build 
-./ParaCL <input_file>
+./build/ParaCL <input_file>
 ```
 
 ## Запуск unit-тестов:
