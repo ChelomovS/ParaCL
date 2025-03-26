@@ -15,7 +15,7 @@ class GraphDump final : public ast::NodeVisitor {
   private:
     std::unique_ptr<std::ostream> dump_file_;
   public:
-    GraphDump(const ast::Ast& ast) : NodeVisitor{ast}, dump_file_{nullptr} {
+    GraphDump(const ast::Ast* ast) : NodeVisitor{ast}, dump_file_{nullptr} {
         std::filesystem::path graphviz_dir = "graphviz";
         if (!std::filesystem::exists(graphviz_dir)) {
             std::filesystem::create_directory(graphviz_dir);

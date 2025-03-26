@@ -23,7 +23,7 @@ namespace intpr {
 void Interpreter::visit_all() {
     trace_calls();
 
-    ast_.root_->accept(this);
+    ast_->root_->accept(this);
 }
 
 void Interpreter::visit(const ast::WhileNode& node) {
