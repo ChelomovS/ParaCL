@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         compiler: [g++, clang++]
@@ -26,11 +26,37 @@ jobs:
     - name: build
       run: |
         cmake --build build --parallel `nproc`
+
+
+  run-tests:
+    needs: build
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+
+    - name: install deps
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake g++ flex bison libfl-dev libgtest-dev ninja-build
+
+    - name: configure
+      run: |
+        cmake -S . -B build \
+          -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+    - name: build
+      run: |
+        cmake --build build --parallel `nproc`
     - name: unit-tests
       run: |
-        cd build
+        cd build/tests
         ctest --output-on-failure
     - name: ete-tests
       run: |
         cd tests/end_to_end
         ./ete_runner.py
+
