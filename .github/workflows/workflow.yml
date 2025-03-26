@@ -19,14 +19,18 @@ jobs:
         sudo apt-get install -y cmake g++ flex bison libfl-dev libgtest-dev ninja-build
     - name: configure
       run: |
-        cmake -S . -B build/debug \
+        cmake -S . -B build \
           -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
           -DCMAKE_CXX_COMPILER=${{matrix.compiler}} \
           -G="${{matrix.generator}}"
     - name: build
       run: |
-        cmake --build build/debug --parallel `nproc`
-    - name: test debug
+        cmake --build build --parallel `nproc`
+    - name: unit-tests
       run: |
-        cd build/debug 
+        cd build
         ctest --output-on-failure
+    - name: ete-tests
+      run: |
+        cd tests/end_to_end
+        ./ete_runner.py
