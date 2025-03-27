@@ -24,7 +24,7 @@ class ExprNode;
 
 class NodeVisitor {
   public: 
-    NodeVisitor(const Ast& ast)
+    NodeVisitor(const Ast* ast)
         : ast_{ast} {}
     virtual ~NodeVisitor() = default;
 
@@ -44,7 +44,7 @@ class NodeVisitor {
     virtual void visit(const ScopeNode& node) = 0;
     virtual void visit(const ExprNode& node) = 0;
   protected:
-    const Ast& ast_;
+    const Ast* ast_;
 };
 
 } // namespace

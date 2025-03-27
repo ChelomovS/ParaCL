@@ -10,6 +10,7 @@
 
 #include "parser/ast.hpp"
 #include "parser/driver.hpp"
+#include "parser/lexer.hpp"
 #include "interpreter/interpreter.hpp"
 
 #if defined (GRAPHVIZ)
@@ -57,7 +58,7 @@ int main(const int argc, const char* argv[]) {
 
     ast::Ast ast = std::move(driver.tree);
 #if defined (GRAPHVIZ)
-    gdump::GraphDump graph_dump{ast};
+    gdump::GraphDump graph_dump{&ast};
     graph_dump.visit_all();
 
     spdlog::debug("graphviz dumped");
@@ -67,7 +68,7 @@ int main(const int argc, const char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    intpr::Interpreter interpreter(ast);
+    intpr::Interpreter interpreter(&ast);
     try {
         interpreter.visit_all();
     } catch (const std::runtime_error& e) {

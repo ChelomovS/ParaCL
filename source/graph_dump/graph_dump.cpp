@@ -18,8 +18,8 @@ namespace gdump {
 
 void GraphDump::visit_all() {
     *dump_file_ << "digraph G {" << std::endl;
-    if (ast_.root_) {
-        ast_.root_->accept(this);
+    if (ast_->root_) {
+        ast_->root_->accept(this);
     }
 
     *dump_file_ << "}" << std::endl;

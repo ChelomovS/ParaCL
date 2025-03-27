@@ -277,14 +277,16 @@ class ExprNode final : public TreeNode {
 
 class Ast final {
   public:
-    Ast() = default;
     TreeNode* root_= nullptr;
     std::vector<TreeNode*> nodes_{};
+    Ast() = default;
+
     Ast(const Ast&) = delete;
     Ast& operator=(const Ast&) = delete;
 
     Ast(Ast&& other) noexcept 
-        : root_(other.root_), nodes_(std::move(other.nodes_)) {
+        : root_(other.root_), nodes_(std::move(other.nodes_)) 
+    {
         other.root_ = nullptr;
     }
 
@@ -298,11 +300,10 @@ class Ast final {
     }
 
     ~Ast() {
-      for (auto it : nodes_) {
-        delete it;
-      }
-
-  }
+        for (auto&& it : nodes_) {
+            delete it;
+        }
+    }
   public:
     bool empty() const {
         return nodes_.empty();

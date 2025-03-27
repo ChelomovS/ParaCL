@@ -18,7 +18,7 @@ target_compile_options(pcl-defaults
             -Og
             -g3
             -ggdb
-            # -fsanitize=address,leak,undefined
+            -fsanitize=address,leak,undefined
         >
 
         $<$<CONFIG:Release>:
@@ -35,7 +35,7 @@ target_link_options(pcl-defaults
             -Og
             -g3
             -ggdb
-            # -fsanitize=address,leak,undefined
+            -fsanitize=address,leak,undefined
         >
 
         $<$<CONFIG:Release>:

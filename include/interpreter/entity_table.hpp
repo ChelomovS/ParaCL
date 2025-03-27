@@ -10,6 +10,8 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ranges.h>
 
+namespace intpr {
+
 template <typename ValueT>
 class EntityTable {
   public:
@@ -88,5 +90,7 @@ class EntityTable {
         spdlog::trace("scopes: {}", scopes_);
     }
 };
+
+} // namespace intpr
 
 #endif // ENTITY_TABLE_HPP
